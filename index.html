@@ -429,11 +429,19 @@ window.onload = function() {
   checkUserSession(); 
   updateNetworkStatus();
 
-  // Ficha loader pindi kila kitu kinapokaa sawa
-  const loader = document.getElementById('app-loader');
-  if (loader) {
-    loader.style.opacity = '0';
-    setTimeout(() => loader.style.display = 'none', 500);
+  window.onload = async function() { 
+  try {
+    await checkUserSession(); 
+    updateNetworkStatus();
+  } catch (err) {
+    console.error("Session check error:", err);
+  } finally {
+    // Hii itafanya kazi BILA KUSHINDWA hata kama session ikigoma au ikichelewa
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    }
   }
 };
 
