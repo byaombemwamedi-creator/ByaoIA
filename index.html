@@ -122,7 +122,6 @@
     textarea { resize: none; height: 120px; }
     textarea:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(139,92,246,0.3); }
     
-    /* Kitufe Kikuu chenye Glow Animation */
     .btn { 
       width: 100%; 
       background: linear-gradient(135deg, var(--primary), var(--primary-hover)); 
@@ -148,7 +147,6 @@
     .btn:hover { transform: translateY(-2px) scale(1.01); opacity: 0.95; }
     .btn-secondary { background: #334155; margin-top: 8px; animation: none; box-shadow: none; }
 
-    /* Style Selector & Bounce Animation */
     .style-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
     .style-option { 
       background: var(--card-bg); 
@@ -176,7 +174,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Image Display Area */
     .result-container { background: var(--card-bg); border: 1px dashed #334155; border-radius: 16px; min-height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
     .result-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; animation: zoomIn 0.35s ease; }
 
@@ -185,29 +182,25 @@
       to { transform: scale(1); opacity: 1; }
     }
 
-    /* Rewarded Ad Box kwenye Page d'accueil chini ya matokeo */
     .rewarded-ad-box { background: #1e1b4b; border: 1px solid var(--primary); border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: center; }
 
-    /* Pricing Plans Cards */
     .pricing-card { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
     .pricing-card:hover { border-color: var(--primary); transform: translateX(3px); }
     .pricing-card.featured { border-color: var(--success); background: #064e3b22; }
 
-    /* Gallery Grid */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
     .gallery-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #334155; transition: 0.2s; }
     .gallery-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
     .gallery-card img { width: 100%; height: 140px; object-fit: cover; }
     .gallery-card-info { padding: 10px; font-size: 0.8rem; }
 
-    /* Toast Notification */
     #toast-notification { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; border: 1px solid var(--primary); padding: 10px 22px; border-radius: 30px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; text-align: center; white-space: nowrap; }
     #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
     .payment-box { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; margin-bottom: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
     .payment-box:hover { border-color: #38bdf8; }
     .payment-box span { font-weight: bold; font-size: 0.85rem; color: #38bdf8; }
-    .payment-box p { font-size: 0.8rem; color: #94a3b8; }
+    .payment-box p { font-size: 0.8rem; color: var(--text-muted); }
     .copy-btn { background: #334155; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
     .copy-btn:hover { background: var(--primary); }
 
@@ -215,7 +208,6 @@
     .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; font-size: 0.85rem; transition: 0.2s; }
     .social-btn:hover { transform: scale(1.01); }
 
-    /* Bottom Navigation */
     .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 12px 0; z-index: 10; }
     .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
     .nav-item:hover { color: var(--text-light); }
@@ -226,25 +218,19 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     .ad-banner-box { background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px dashed var(--primary); border-radius: 10px; padding: 10px; text-align: center; margin-bottom: 14px; font-size: 0.75rem; color: var(--text-muted); }
-    @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
   </style>
 </head>
 <body>
   
 <div id="app-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;">
-  <!-- Unaweza kuweka rangi ya spinner iendane na muundo wa app yako -->
   <div style="border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
   <p style="margin-top: 15px; font-family: sans-serif; color: #555; font-size: 14px;">Recharge ByaoIA...</p>
 </div>
 
   <div class="app-screen">
 
-    <!-- NOTIFICATION TOAST -->
     <div id="toast-notification">Notification</div>
 
-    <!-- VUE 0 : AUTHENTIFICATION -->
     <div id="view-auth" class="view active">
       <div class="auth-container">
         <svg class="auth-logo" viewBox="0 0 512 512">
@@ -277,7 +263,6 @@
       </div>
     </div>
 
-    <!-- HEADER COMMUN -->
     <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
       <div class="app-header">
         <div class="logo-container">
@@ -294,7 +279,6 @@
       </div>
     </div>
 
-    <!-- VUE 1 : GÉNÉRATEUR -->
     <div id="view-generate" class="view">
       <div id="connection-status" class="status-online">Inachunguza mtandao...</div>
 
@@ -327,7 +311,6 @@
         <button id="download-btn" class="btn btn-secondary" style="display:none; margin-bottom: 14px;" onclick="downloadCurrentImage()">📥 Télécharger l'Image</button>
       </div>
 
-      <!-- Kadi ya Kuangalia Video Kupata Mikopo (Imehamishiwa hapa chini ya matokeo kama ulivyoomba) -->
       <div class="rewarded-ad-box">
         <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
@@ -335,7 +318,6 @@
       </div>
     </div>
 
-    <!-- VUE 2 : GALERIE / HISTORIQUE -->
     <div id="view-gallery" class="view">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h3 style="font-size: 1.1rem;">Mes Créations</h3>
@@ -344,7 +326,6 @@
       <div class="gallery-grid" id="gallery-container"></div>
     </div>
 
-    <!-- VUE 3 : RECHARGE & PAIEMENT -->
     <div id="view-recharge" class="view">
       <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits & Monétisation</h3>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Choisissez votre formule économique :</p>
@@ -388,7 +369,6 @@
       </a>
     </div>
 
-    <!-- VUE 4 : CONTACTS -->
     <div id="view-contact" class="view">
       <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Communauté & Support</h3>
       <div class="social-links">
@@ -402,7 +382,6 @@
       </div>
     </div>
 
-    <!-- BARRE DE NAVIGATION INFÉRIEURE -->
     <div class="bottom-nav" id="bottom-navigation" style="display: none;">
       <div class="nav-item active" onclick="switchView('view-generate')"><span class="nav-icon">✨</span>Créer</div>
       <div class="nav-item" onclick="switchView('view-gallery')"><span class="nav-icon">🖼️</span>Galerie</div>
@@ -410,7 +389,6 @@
       <div class="nav-item" onclick="switchView('view-contact')"><span class="nav-icon">🌐</span>Contacts</div>
     </div>
 
-    <!-- LOADER MODAL -->
     <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%;background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
       <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
         <div class="spinner"></div>
@@ -425,29 +403,20 @@
     const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
     let selectedStyle = "Photoréaliste";
     let currentGeneratedImageUrl = "";
-window.onload = function() { 
-  checkUserSession(); 
-  updateNetworkStatus();
 
-  window.onload = async function() { 
-  try {
-    await checkUserSession(); 
-    updateNetworkStatus();
-  } catch (err) {
-    console.error("Session check error:", err);
-  } finally {
-    // Hii itafanya kazi BILA KUSHINDWA hata kama session ikigoma au ikichelewa
-    const loader = document.getElementById('app-loader');
-    if (loader) {
-      loader.style.opacity = '0';
-      setTimeout(() => loader.style.display = 'none', 500);
-    }
-  }
-};
-
-    window.onload = function() { 
-      checkUserSession(); 
-      updateNetworkStatus();
+    window.onload = async function() { 
+      try {
+        checkUserSession(); 
+        updateNetworkStatus();
+      } catch (err) {
+        console.error("Session check error:", err);
+      } finally {
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 500);
+        }
+      }
     };
 
     window.addEventListener('online', () => {
@@ -462,31 +431,43 @@ window.onload = function() {
 
     function updateNetworkStatus() {
       const statusEl = document.getElementById('connection-status');
-      if (navigator.onLine) {
-        statusEl.className = "status-online";
-        statusEl.innerHTML = "🟢 Connecté au réseau";
-      } else {
-        statusEl.className = "status-offline";
-        statusEl.innerHTML = "🔴 Pas de connexion réseau";
+      if (statusEl) {
+        if (navigator.onLine) {
+          statusEl.className = "status-online";
+          statusEl.innerHTML = "🟢 Connecté au réseau";
+        } else {
+          statusEl.className = "status-offline";
+          statusEl.innerHTML = "🔴 Pas de connexion réseau";
+        }
       }
     }
 
     function showToast(message) {
       const toast = document.getElementById('toast-notification');
-      toast.innerText = message;
-      toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 3000);
+      if (toast) {
+        toast.innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+      }
     }
 
     function checkUserSession() {
       const userEmail = localStorage.getItem('byaoia_user_email');
-      if (userEmail) { activateAppSession(localStorage.getItem('byaoia_user_name') || userEmail); }
-      else { document.getElementById('view-auth').classList.add('active'); }
+      if (userEmail) { 
+        activateAppSession(localStorage.getItem('byaoia_user_name') || userEmail); 
+      } else { 
+        const authView = document.getElementById('view-auth');
+        if (authView) authView.classList.add('active'); 
+      }
     }
 
     function loginWithEmail() {
-      const email = document.getElementById('auth-email').value.trim();
-      const name = document.getElementById('auth-name').value.trim();
+      const emailInput = document.getElementById('auth-email');
+      const nameInput = document.getElementById('auth-name');
+      if (!emailInput) return;
+      
+      const email = emailInput.value.trim();
+      const name = nameInput ? nameInput.value.trim() : "";
 
       if (!email || !email.includes('@')) { showToast("Veuillez entrer un email valide."); return; }
 
@@ -527,7 +508,8 @@ window.onload = function() {
     function initUserCredits() {
       let credits = localStorage.getItem('byaoia_credits');
       if (credits === null) { credits = 5; localStorage.setItem('byaoia_credits', credits); }
-      document.getElementById('user-credits').innerText = credits;
+      const creditEl = document.getElementById('user-credits');
+      if (creditEl) creditEl.innerText = credits;
     }
 
     function setStyle(element, styleName) {
@@ -539,9 +521,13 @@ window.onload = function() {
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
+      const targetView = document.getElementById(viewId);
+      if (targetView) targetView.classList.add('active');
       const navMap = { 'view-generate': 0, 'view-gallery': 1, 'view-recharge': 2, 'view-contact': 3 };
-      if (navMap[viewId] !== undefined) { document.querySelectorAll('.nav-item')[navMap[viewId]].classList.add('active'); }
+      if (navMap[viewId] !== undefined) { 
+        const navItems = document.querySelectorAll('.nav-item');
+        if (navItems[navMap[viewId]]) navItems[navMap[viewId]].classList.add('active'); 
+      }
       if (viewId === 'view-gallery') renderGallery();
     }
 
@@ -550,20 +536,24 @@ window.onload = function() {
       setTimeout(() => {
         let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
         localStorage.setItem('byaoia_credits', credits);
-        document.getElementById('user-credits').innerText = credits;
+        const creditEl = document.getElementById('user-credits');
+        if (creditEl) creditEl.innerText = credits;
         showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
       }, 2000);
     }
 
     async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-      const promptText = document.getElementById('prompt-input').value.trim();
+      const promptInput = document.getElementById('prompt-input');
+      const promptText = promptInput ? promptInput.value.trim() : "";
 
       if (!promptText) { showToast("Veuillez décrire votre image."); return; }
       if (credits < 1) { showToast("Crédits épuisés. Redirection..."); switchView('view-recharge'); return; }
 
-      document.getElementById('loader-subtitle').innerText = "L'IA façonne votre image...";
-      document.getElementById('loading-modal').style.display = "flex";
+      const loaderSub = document.getElementById('loader-subtitle');
+      if (loaderSub) loaderSub.innerText = "L'IA façonne votre image...";
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "flex";
 
       try {
         const response = await fetch(AI_BACKEND_URL, {
@@ -578,24 +568,30 @@ window.onload = function() {
         });
 
         const data = await response.json();
-        document.getElementById('loading-modal').style.display = "none";
+        if (loadModal) loadModal.style.display = "none";
         const imageUrl = data.image_url || data.url || (data.data && data.data.url);
 
         if (imageUrl) {
           credits -= 1;
           localStorage.setItem('byaoia_credits', credits);
-          document.getElementById('user-credits').innerText = credits;
+          const creditEl = document.getElementById('user-credits');
+          if (creditEl) creditEl.innerText = credits;
           currentGeneratedImageUrl = imageUrl;
-          document.getElementById('result-box').innerHTML = `<img src="${imageUrl}" alt="Génération ByaoIA">`;
-          document.getElementById('download-btn').style.display = "block";
+          
+          const resultBox = document.getElementById('result-box');
+          if (resultBox) resultBox.innerHTML = `<img src="${imageUrl}" alt="Génération ByaoIA">`;
+          
+          const downloadBtn = document.getElementById('download-btn');
+          if (downloadBtn) downloadBtn.style.display = "block";
+          
           saveToGallery(promptText, imageUrl);
           showToast("Image générée avec succès !");
-          document.getElementById('prompt-input').value = "";
+          if (promptInput) promptInput.value = "";
         } else {
           showToast("Erreur : Aucune image reçue.");
         }
       } catch (err) {
-        document.getElementById('loading-modal').style.display = "none";
+        if (loadModal) loadModal.style.display = "none";
         showToast("Erreur de connexion au serveur.");
       }
     }
@@ -608,6 +604,7 @@ window.onload = function() {
 
     function renderGallery() {
       const container = document.getElementById('gallery-container');
+      if (!container) return;
       const gallery = JSON.parse(localStorage.getItem('byaoia_gallery')) || [];
 
       if (gallery.length === 0) {
