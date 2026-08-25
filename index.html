@@ -32,7 +32,6 @@
       overflow: hidden;
     }
     
-    /* Skrini inajaa vizuri kwenye simu, tablet, na kompyuta */
     .app-screen { 
       width: 100vw; 
       max-width: 100%; 
@@ -47,22 +46,11 @@
     }
 
     @media (min-width: 768px) {
-      .app-screen {
-        border-left: 1px solid #1e293b;
-        border-right: 1px solid #1e293b;
-      }
-      .view {
-        max-width: 800px;
-        margin: 0 auto;
-        width: 100%;
-      }
+      .app-screen { border-left: 1px solid #1e293b; border-right: 1px solid #1e293b; }
+      .view { max-width: 800px; margin: 0 auto; width: 100%; }
     }
 
-    @media (min-width: 1024px) {
-      .view {
-        max-width: 950px;
-      }
-    }
+    @media (min-width: 1024px) { .view { max-width: 950px; } }
 
     .view { 
       display: none; 
@@ -157,10 +145,7 @@
       100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
     }
 
-    .btn:hover { 
-      transform: translateY(-2px) scale(1.01); 
-      opacity: 0.95; 
-    }
+    .btn:hover { transform: translateY(-2px) scale(1.01); opacity: 0.95; }
     .btn-secondary { background: #334155; margin-top: 8px; animation: none; box-shadow: none; }
 
     /* Style Selector & Bounce Animation */
@@ -176,13 +161,7 @@
       color: var(--text-muted); 
       transition: all 0.25s ease; 
     }
-    
-    .style-option:hover { 
-      border-color: var(--primary); 
-      color: #fff; 
-      transform: translateY(-2px); 
-    }
-
+    .style-option:hover { border-color: var(--primary); color: #fff; transform: translateY(-2px); }
     .style-option.active { 
       border-color: var(--accent); 
       background: #2d1b4e; 
@@ -197,18 +176,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Shimmer Animation wakati wa kupakia */
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    .loading-shimmer {
-      background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-    }
-
     /* Image Display Area */
     .result-container { background: var(--card-bg); border: 1px dashed #334155; border-radius: 16px; min-height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
     .result-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; animation: zoomIn 0.35s ease; }
@@ -217,6 +184,9 @@
       from { transform: scale(0.96); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
+
+    /* Rewarded Ad Box kwenye Page d'accueil chini ya matokeo */
+    .rewarded-ad-box { background: #1e1b4b; border: 1px solid var(--primary); border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: center; }
 
     /* Pricing Plans Cards */
     .pricing-card { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
@@ -255,7 +225,6 @@
     .spinner { width: 40px; height: 40px; border: 4px solid #334155; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Eneo la Matangazo ya Nje (Monetization Ad Banner) */
     .ad-banner-box { background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px dashed var(--primary); border-radius: 10px; padding: 10px; text-align: center; margin-bottom: 14px; font-size: 0.75rem; color: var(--text-muted); }
   </style>
 </head>
@@ -318,10 +287,8 @@
 
     <!-- VUE 1 : GÉNÉRATEUR -->
     <div id="view-generate" class="view">
-      <!-- KITAMBUZI CHA MTANDAO -->
       <div id="connection-status" class="status-online">Inachunguza mtandao...</div>
 
-      <!-- Eneo la Matangazo ya Nje (Monetization Banner Space) -->
       <div class="ad-banner-box">
         📢 Espace Publicitaire / Sponsor (ByyaoIA Ads)
       </div>
@@ -348,7 +315,14 @@
             L'image générée s'affichera ici.
           </p>
         </div>
-        <button id="download-btn" class="btn btn-secondary" style="display:none;" onclick="downloadCurrentImage()">📥 Télécharger l'Image</button>
+        <button id="download-btn" class="btn btn-secondary" style="display:none; margin-bottom: 14px;" onclick="downloadCurrentImage()">📥 Télécharger l'Image</button>
+      </div>
+
+      <!-- Kadi ya Kuangalia Video Kupata Mikopo (Imehamishiwa hapa chini ya matokeo kama ulivyoomba) -->
+      <div class="rewarded-ad-box">
+        <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
+        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (AdMob)</button>
       </div>
     </div>
 
@@ -380,13 +354,6 @@
           <p style="font-size: 0.75rem; color: var(--text-muted);">60 Crédits + Support Prioritaire</p>
         </div>
         <p style="font-weight: bold; color: var(--success);">10 000 FC / 12 000 FBu</p>
-      </div>
-
-      <!-- Matangazo ya Ndani ya Tazama Video upate Credits (Rewarded Ads Simulation) -->
-      <div style="background: #1e1b4b; border: 1px solid var(--primary); border-radius: 12px; padding: 14px; margin-bottom: 14px; text-align: center;">
-        <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
-        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (AdMob)</button>
       </div>
 
       <p style="font-size: 0.8rem; color: var(--text-muted); margin: 12px 0 6px 0;">Effectuez le paiement via :</p>
@@ -435,7 +402,7 @@
     </div>
 
     <!-- LOADER MODAL -->
-    <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
+    <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%;background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
       <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
         <div class="spinner"></div>
         <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Création en cours...</h3>
@@ -453,28 +420,26 @@
     window.onload = function() { 
       checkUserSession(); 
       updateNetworkStatus();
-      checkPendingQueue();
     };
 
     window.addEventListener('online', () => {
       updateNetworkStatus();
-      showToast("Mtandao umerudi! Inasawazisha maombi...");
-      syncPendingQueue();
+      showToast("Mtandao umerudi!");
     });
 
     window.addEventListener('offline', () => {
       updateNetworkStatus();
-      showToast("Huna mtandao. App ipo kwenye Offline Mode.");
+      showToast("Huna mtandao kwa sasa.");
     });
 
     function updateNetworkStatus() {
       const statusEl = document.getElementById('connection-status');
       if (navigator.onLine) {
         statusEl.className = "status-online";
-        statusEl.innerHTML = "🟢 vous êtes en ligne (Online Mode)";
+        statusEl.innerHTML = "🟢 Connecté au réseau";
       } else {
         statusEl.className = "status-offline";
-        statusEl.innerHTML = "🔴 pas de connexion (Offline - requête sauvegardée)";
+        statusEl.innerHTML = "🔴 Pas de connexion réseau";
       }
     }
 
@@ -552,7 +517,6 @@
       if (viewId === 'view-gallery') renderGallery();
     }
 
-    // Mfumo wa Rewarded Ad kwa ajili ya kuongeza mikopo ya bure
     function watchAdForCredits() {
       showToast("Chargement de la publicité...");
       setTimeout(() => {
@@ -569,11 +533,6 @@
 
       if (!promptText) { showToast("Veuillez décrire votre image."); return; }
       if (credits < 1) { showToast("Crédits épuisés. Redirection..."); switchView('view-recharge'); return; }
-
-      if (!navigator.onLine) {
-        saveToOfflineQueue(promptText);
-        return;
-      }
 
       document.getElementById('loader-subtitle').innerText = "L'IA façonne votre image...";
       document.getElementById('loading-modal').style.display = "flex";
@@ -609,62 +568,7 @@
         }
       } catch (err) {
         document.getElementById('loading-modal').style.display = "none";
-        saveToOfflineQueue(promptText);
-      }
-    }
-
-    function saveToOfflineQueue(prompt) {
-      let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
-      queue.push({ prompt: prompt, style: selectedStyle, date: new Date().toLocaleTimeString() });
-      localStorage.setItem('byaoia_offline_queue', JSON.stringify(queue));
-      
-      document.getElementById('prompt-input').value = "";
-      showToast("💾 Pas de réseau. Requête sauvegardée localement !");
-    }
-
-    function checkPendingQueue() {
-      let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
-      if (queue.length > 0 && navigator.onLine) {
-        syncPendingQueue();
-      }
-    }
-
-    async function syncPendingQueue() {
-      let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
-      if (queue.length === 0 || !navigator.onLine) return;
-
-      showToast(`Synchronisation de ${queue.length} requête(s)...`);
-      let currentReq = queue[0];
-      
-      try {
-        const response = await fetch(MAKE_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: localStorage.getItem('byaoia_user_email'),
-            prompt: currentReq.prompt,
-            style: currentReq.style,
-            timestamp: new Date().toISOString()
-          })
-        });
-
-        const data = await response.json();
-        const imageUrl = data.image_url || data.url || (data.data && data.data.url);
-
-        if (imageUrl) {
-          let credits = parseInt(localStorage.getItem('byaoia_credits') || "1") - 1;
-          localStorage.setItem('byaoia_credits', Math.max(0, credits));
-          document.getElementById('user-credits').innerText = localStorage.getItem('byaoia_credits');
-          
-          saveToGallery(currentReq.prompt, imageUrl);
-          queue.shift();
-          localStorage.setItem('byaoia_offline_queue', JSON.stringify(queue));
-          
-          showToast("Synchronisation réussie !");
-          if (queue.length > 0) { syncPendingQueue(); }
-        }
-      } catch (err) {
-        console.error("Échec de la synchronisation:", err);
+        showToast("Erreur de connexion au serveur.");
       }
     }
 
