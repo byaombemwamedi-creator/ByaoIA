@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ByaoIA - Studio Créatif Pro</title>
+  <meta name="theme-color" content="#0f172a">
+
+  <style>
+    :root {
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #ec4899;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; min-height: 100vh; }
+    
+    .app-screen { width: 100%; max-width: 430px; background-color: #0b0f19; display: flex; flex-direction: column; height: 100vh; position: relative; overflow: hidden; }
+
+    .view { display: none; flex-direction: column; height: 100%; padding: 18px; overflow-y: auto; padding-bottom: 80px; }
+    .view.active { display: flex; }
+
+    /* Auth & Login Screen */
+    .auth-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; padding: 20px; }
+    .auth-logo { width: 90px; height: 90px; margin-bottom: 20px; filter: drop-shadow(0 8px 16px rgba(139,92,246,0.4)); }
+    .btn-google { background: #ffffff; color: #1e293b; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+    .btn-google:hover { background: #f1f5f9; }
+    .divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); margin: 15px 0; font-size: 0.8rem; width: 100%; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #334155; }
+    .divider::before { margin-right: .5em; }
+    .divider::after { margin-left: .5em; }
+
+    /* Header & Balance */
+    .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .logo-container { display: flex; align-items: center; gap: 10px; }
+    .header-logo { width: 32px; height: 32px; }
+    .logo-badge { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.2rem; }
+    .credit-badge { background: #1e1b4b; border: 1px solid var(--primary); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; color: #c084fc; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+    /* Network Status Indicator */
+    #connection-status { padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-bottom: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .status-online { background: #064e3b22; color: var(--success); border: 1px solid var(--success); }
+    .status-offline { background: #7f1d1d22; color: #ef4444; border: 1px solid #ef4444; }
+
+    /* Form Inputs */
+    textarea, input { width: 100%; background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; color: #fff; font-size: 0.95rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
+    textarea { resize: none; height: 110px; }
+    textarea:focus, input:focus { border-color: var(--primary); }
+    
+    .btn { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background: #334155; margin-top: 8px; }
+
+    /* Style Tags */
+    .style-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+    .style-option { background: var(--card-bg); border: 1px solid #334155; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 0.75rem; cursor: pointer; color: var(--text-muted); }
+    .style-option.active { border-color: var(--accent); background: #2d1b4e; color: #fff; font-weight: bold; }
+
+    /* Image Display Area */
+    .result-container { background: var(--card-bg); border: 1px dashed #334155; border-radius: 16px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .result-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+
+    /* Pricing Plans Cards */
+    .pricing-card { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .pricing-card.featured { border-color: var(--success); background: #064e3b22; }
+
+    /* Gallery Grid */
+    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .gallery-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #334155; }
+    .gallery-card img { width: 100%; height: 130px; object-fit: cover; }
+    .gallery-card-info { padding: 8px; font-size: 0.75rem; }
+
+    /* Toast Notification */
+    #toast-notification { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; border: 1px solid var(--primary); padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; text-align: center; white-space: nowrap; }
+    #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .payment-box { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+    .payment-box span { font-weight: bold; font-size: 0.85rem; color: #38bdf8; }
+    .payment-box p { font-size: 0.8rem; color: #94a3b8; }
+    .copy-btn { background: #334155; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; }
+
+    .social-links { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; font-size: 0.85rem; }
+
+    /* Bottom Navigation */
+    .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 12px 0; z-index: 10; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--text-muted); cursor: pointer; }
+    .nav-item.active { color: var(--primary); font-weight: bold; }
+    .nav-icon { font-size: 1.3rem; margin-bottom: 2px; }
+
+    .spinner { width: 40px; height: 40px; border: 4px solid #334155; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="app-screen">
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast-notification">Notification</div>
+
+    <!-- VUE 0 : AUTHENTIFICATION -->
+    <div id="view-auth" class="view active">
+      <div class="auth-container">
+        <!-- SVG LOGO OFFICIEL BYAOIA -->
+        <svg class="auth-logo" viewBox="0 0 512 512">
+          <defs>
+            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8b5cf6" />
+              <stop offset="50%" stop-color="#d946ef" />
+              <stop offset="100%" stop-color="#ec4899" />
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="115" fill="#0f172a"/>
+          <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#bgGrad)" stroke-width="6" opacity="0.4"/>
+          <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z M220 170 V230 H255 C275 230 290 220 290 200 C290 180 275 170 255 170 H220 Z M220 280 V350 H265 C288 350 302 338 302 315 C302 292 288 280 265 280 H220 Z" fill="url(#bgGrad)"/>
+          <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ffffff"/>
+        </svg>
+
+        <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Pro</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Votre Suite Créative d'Intelligence Artificielle.</p>
+        
+        <button class="btn btn-google" onclick="loginWithGoogle()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.3 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.1 0 9.8 0 12s.43 3.9 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.7 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+          Continuer avec Google
+        </button>
+
+        <div class="divider">ou avec votre email</div>
+
+        <input type="email" id="auth-email" placeholder="Votre adresse email">
+        <input type="text" id="auth-name" placeholder="Votre nom complet">
+        <button class="btn" onclick="loginWithEmail()">Se connecter / S'inscrire</button>
+      </div>
+    </div>
+
+    <!-- HEADER COMMUN -->
+    <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
+      <div class="app-header">
+        <div class="logo-container">
+          <svg class="header-logo" viewBox="0 0 512 512">
+            <rect width="512" height="512" rx="115" fill="#0f172a"/>
+            <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z" fill="#8b5cf6"/>
+            <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ec4899"/>
+          </svg>
+          <div class="logo-badge">ByaoIA</div>
+        </div>
+        <div class="credit-badge" onclick="switchView('view-recharge')">
+          ⚡ <span id="user-credits">5</span> Crédits
+        </div>
+      </div>
+    </div>
+
+    <!-- VUE 1 : GÉNÉRATEUR -->
+    <div id="view-generate" class="view">
+      <!-- KITAMBUZI CHA MTANDAO (NETWORK STATUS) -->
+      <div id="connection-status" class="status-online">Inachunguza mtandao...</div>
+
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
+
+      <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Choisir un style :</p>
+      <div class="style-selector">
+        <div class="style-option active" onclick="setStyle(this, 'Photoréaliste')">📸 Réaliste</div>
+        <div class="style-option" onclick="setStyle(this, '3D Render')">🎨 3D Render</div>
+        <div class="style-option" onclick="setStyle(this, 'Anime')">⛩️ Anime</div>
+        <div class="style-option" onclick="setStyle(this, 'Cyberpunk')">🏙️ Cyberpunk</div>
+        <div class="style-option" onclick="setStyle(this, 'Peinture')">🖌️ Peinture</div>
+        <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏️ Logo</div>
+      </div>
+
+      <button class="btn" onclick="generateImage()">✨ Générer l'Image (1 Crédit)</button>
+
+      <div style="margin-top: 20px;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Résultat :</p>
+        <div class="result-container" id="result-box">
+          <p id="placeholder-text" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">
+            L'image générée s'affichera ici.
+          </p>
+        </div>
+        <button id="download-btn" class="btn btn-secondary" style="display:none;" onclick="downloadCurrentImage()">📥 Télécharger l'Image</button>
+      </div>
+    </div>
+
+    <!-- VUE 2 : GALERIE / HISTORIQUE -->
+    <div id="view-gallery" class="view">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 1.1rem;">Mes Créations</h3>
+        <button onclick="clearGallery()" style="background: none; border: none; color: var(--accent); font-size: 0.75rem; cursor: pointer;">Effacer l'historique</button>
+      </div>
+      <div class="gallery-grid" id="gallery-container"></div>
+    </div>
+
+    <!-- VUE 3 : RECHARGE & PAIEMENT -->
+    <div id="view-recharge" class="view">
+      <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Choisissez votre formule économique :</p>
+
+      <div class="pricing-card">
+        <div>
+          <p style="font-weight: bold; font-size: 0.9rem;">Pack Starter</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">20 Crédits</p>
+        </div>
+        <p style="font-weight: bold; color: var(--success);">1 000 FC / 500 FBu</p>
+      </div>
+
+      <div class="pricing-card featured">
+        <div>
+          <p style="font-weight: bold; font-size: 0.9rem;">Pack Pro (Populaire)</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">60 Crédits + Support Prioritaire</p>
+        </div>
+        <p style="font-weight: bold; color: var(--success);">2 500 FC / 1 200 FBu</p>
+      </div>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 12px 0 6px 0;">Effectuez le paiement via :</p>
+
+      <div class="payment-box">
+        <div>
+          <span>🔴 M-Pesa (RDC)</span>
+          <p>+243839406922</p>
+        </div>
+        <button class="copy-btn" onclick="copyText('+243839406922')">Copier</button>
+      </div>
+
+      <div class="payment-box">
+        <div>
+          <span>🟢 Lumicash (Burundi)</span>
+          <p>+25767843604</p>
+        </div>
+        <button class="copy-btn" onclick="copyText('+25767843604')">Copier</button>
+      </div>
+
+      <a href="https://wa.me/25767843604?text=Bonjour,%20je%20viens%20d'effectuer%20un%20paiement%20pour%20recharger%20mes%20cr%C3%A9dits%20ByaoIA." target="_blank" class="btn" style="background: #16a34a; text-decoration:none; text-align:center; display:block; margin-top: 10px;">
+        💬 Valider la recharge via WhatsApp
+      </a>
+    </div>
+
+    <!-- VUE 4 : CONTACTS -->
+    <div id="view-contact" class="view">
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Communauté & Support</h3>
+      <div class="social-links">
+        <a href="https://wa.me/25767843604" target="_blank" class="social-btn" style="background: #25D366;">💬 WhatsApp Business</a>
+        <a href="https://wa.me/243815680775" target="_blank" class="social-btn" style="background: #128C7E;">💬 WhatsApp Client</a>
+        <a href="https://www.facebook.com/profile.php?id=61577345702022&mibextid=ZbWKwL" target="_blank" class="social-btn" style="background: #1877F2;">📘 Page Facebook</a>
+        <a href="https://www.tiktok.com/@byaotechrockyn" target="_blank" class="social-btn" style="background: #000; border: 1px solid #334155;">🎵 TikTok</a>
+      </div>
+      <div style="margin-top: 25px; text-align: center;">
+        <button onclick="logoutUser()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 10px 20px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">Se déconnecter</button>
+      </div>
+    </div>
+
+    <!-- BARRE DE NAVIGATION INFÉRIEURE -->
+    <div class="bottom-nav" id="bottom-navigation" style="display: none;">
+      <div class="nav-item active" onclick="switchView('view-generate')"><span class="nav-icon">✨</span>Créer</div>
+      <div class="nav-item" onclick="switchView('view-gallery')"><span class="nav-icon">🖼️</span>Galerie</div>
+      <div class="nav-item" onclick="switchView('view-recharge')"><span class="nav-icon">⚡</span>Recharge</div>
+      <div class="nav-item" onclick="switchView('view-contact')"><span class="nav-icon">🌐</span>Contacts</div>
+    </div>
+
+    <!-- LOADER MODAL -->
+    <div id="loading-modal" class="modal-overlay" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
+      <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
+        <div class="spinner"></div>
+        <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Création en cours...</h3>
+        <p style="font-size: 0.75rem; color: var(--text-muted);" id="loader-subtitle">L'IA façonne votre image...</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/r5srrcpk6o5w6qzrwpsygob3ckinfxf7";
+    let selectedStyle = "Photoréaliste";
+    let currentGeneratedImageUrl = "";
+
+    window.onload = function() { 
+      checkUserSession(); 
+      updateNetworkStatus();
+      checkPendingQueue();
+    };
+
+    // Kusikiliza mabadiliko ya mtandao (Online / Offline Events)
+    window.addEventListener('online', () => {
+      updateNetworkStatus();
+      showToast("Mtandao umerudi! Inasawazisha maombi...");
+      syncPendingQueue();
+    });
+
+    window.addEventListener('offline', () => {
+      updateNetworkStatus();
+      showToast("Huna mtandao. App ipo kwenye Offline Mode.");
+    });
+
+    function updateNetworkStatus() {
+      const statusEl = document.getElementById('connection-status');
+      if (navigator.onLine) {
+        statusEl.className = "status-online";
+        statusEl.innerHTML = "🟢 Uko Mtandaoni (Online Mode)";
+      } else {
+        statusEl.className = "status-offline";
+        statusEl.innerHTML = "🔴 Huna Mtandao (Offline - Maombi yatawekwa akiba)";
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast-notification');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
+
+    function checkUserSession() {
+      const userEmail = localStorage.getItem('byaoia_user_email');
+      if (userEmail) { activateAppSession(localStorage.getItem('byaoia_user_name') || userEmail); }
+      else { document.getElementById('view-auth').classList.add('active'); }
+    }
+
+    function loginWithEmail() {
+      const email = document.getElementById('auth-email').value.trim();
+      const name = document.getElementById('auth-name').value.trim();
+
+      if (!email || !email.includes('@')) { showToast("Veuillez entrer un email valide."); return; }
+
+      localStorage.setItem('byaoia_user_email', email);
+      localStorage.setItem('byaoia_user_name', name || email.split('@')[0]);
+      if (localStorage.getItem('byaoia_credits') === null) { localStorage.setItem('byaoia_credits', 5); }
+
+      showToast("Connexion réussie !");
+      activateAppSession(name || email.split('@')[0]);
+    }
+
+    function loginWithGoogle() {
+      localStorage.setItem('byaoia_user_email', 'user.google@gmail.com');
+      localStorage.setItem('byaoia_user_name', 'Utilisateur Google');
+      if (localStorage.getItem('byaoia_credits') === null) { localStorage.setItem('byaoia_credits', 5); }
+      showToast("Connexion Google réussie !");
+      activateAppSession('Utilisateur Google');
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('byaoia_user_email');
+      localStorage.removeItem('byaoia_user_name');
+      document.getElementById('main-header').style.display = "none";
+      document.getElementById('bottom-navigation').style.display = "none";
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-auth').classList.add('active');
+      showToast("Déconnexion effectuée.");
+    }
+
+    function activateAppSession(username) {
+      document.getElementById('view-auth').classList.remove('active');
+      document.getElementById('main-header').style.display = "block";
+      document.getElementById('bottom-navigation').style.display = "flex";
+      initUserCredits();
+      switchView('view-generate');
+    }
+
+    function initUserCredits() {
+      let credits = localStorage.getItem('byaoia_credits');
+      if (credits === null) { credits = 5; localStorage.setItem('byaoia_credits', credits); }
+      document.getElementById('user-credits').innerText = credits;
+    }
+
+    function setStyle(element, styleName) {
+      document.querySelectorAll('.style-option').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      selectedStyle = styleName;
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      const navMap = { 'view-generate': 0, 'view-gallery': 1, 'view-recharge': 2, 'view-contact': 3 };
+      if (navMap[viewId] !== undefined) { document.querySelectorAll('.nav-item')[navMap[viewId]].classList.add('active'); }
+      if (viewId === 'view-gallery') renderGallery();
+    }
+
+    // UTENDAJI WA KUTENGENEZA PICHA (HYBRID: ONLINE & OFFLINE QUEUE)
+    async function generateImage() {
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+      const promptText = document.getElementById('prompt-input').value.trim();
+
+      if (!promptText) { showToast("Veuillez décrire votre image."); return; }
+      if (credits < 1) { showToast("Crédits épuisés. Redirection..."); switchView('view-recharge'); return; }
+
+      // KAMA HAKUNA MTANDAO: Hifadhi kwenye LocalStorage (Offline Queue)
+      if (!navigator.onLine) {
+        saveToOfflineQueue(promptText);
+        return;
+      }
+
+      // KAMA KUNA MTANDAO: Tuma moja kwa moja kwenye Make Webhook
+      document.getElementById('loader-subtitle').innerText = "L'IA façonne votre image...";
+      document.getElementById('loading-modal').style.display = "flex";
+
+      try {
+        const response = await fetch(MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: localStorage.getItem('byaoia_user_email'),
+            prompt: promptText,
+            style: selectedStyle,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        const data = await response.json();
+        document.getElementById('loading-modal').style.display = "none";
+        const imageUrl = data.image_url || data.url || (data.data && data.data.url);
+
+        if (imageUrl) {
+          credits -= 1;
+          localStorage.setItem('byaoia_credits', credits);
+          document.getElementById('user-credits').innerText = credits;
+          currentGeneratedImageUrl = imageUrl;
+          document.getElementById('result-box').innerHTML = `<img src="${imageUrl}" alt="Génération ByaoIA">`;
+          document.getElementById('download-btn').style.display = "block";
+          saveToGallery(promptText, imageUrl);
+          showToast("Image générée avec succès !");
+          document.getElementById('prompt-input').value = "";
+        } else {
+          showToast("Erreur : Aucune image reçue.");
+        }
+      } catch (err) {
+        document.getElementById('loading-modal').style.display = "none";
+        // Kama kosa limetokea ghafla wakati wa kutuma, lihifadhi offline
+        saveToOfflineQueue(promptText);
+      }
+    }
+
+    // Kuhifadhi ombi kwenye kumbukumbu ya simu kukiwa hakuna mtandao
+    function saveToOfflineQueue(prompt) {
+      let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
+      queue.push({ prompt: prompt, style: selectedStyle, date: new Date().toLocaleTimeString() });
+      localStorage.setItem('byaoia_offline_queue', JSON.stringify(queue));
+      
+      document.getElementById('prompt-input').value = "";
+      showToast("💾 Pas de réseau. Requête sauvegardée localement !");
+    }
+
+    // Kuangalia kama kuna maombi yaliyosubiri
+    function checkPendingQueue() {
+      let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
+      if (queue.length > 0 && navigator.onLine) {
+        syncPendingQueue();
+      }
+    }
+
+    // Kusawazisha data zilizokuwa offline pale mtandao unaporudi
+    async function syncPendingQueue() {
+      let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
+      if (queue.length === 0 || !navigator.onLine) return;
+
+      showToast(`Synchronisation de ${queue.length} requête(s)...`);
+      
+      // Chukua ombi la kwanza
+      let currentReq = queue[0];
+      
+      try {
+        const response = await fetch(MAKE_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: localStorage.getItem('byaoia_user_email'),
+            prompt: currentReq.prompt,
+            style: currentReq.style,
+            timestamp: new Date().toISOString()
+          })
+        });
+
+        const data = await response.json();
+        const imageUrl = data.image_url || data.url || (data.data && data.data.url);
+
+        if (imageUrl) {
+          // Punguza krediti
+          let credits = parseInt(localStorage.getItem('byaoia_credits') || "1") - 1;
+          localStorage.setItem('byaoia_credits', Math.max(0, credits));
+          document.getElementById('user-credits').innerText = localStorage.getItem('byaoia_credits');
+          
+          // Hifadhi kwenye gallery
+          saveToGallery(currentReq.prompt, imageUrl);
+          
+          // Ondoa kwenye foleni ya offline
+          queue.shift();
+          localStorage.setItem('byaoia_offline_queue', JSON.stringify(queue));
+          
+          showToast("Synchronisation réussie ! Image ajoutée à la galerie.");
+          
+          // Kama zimesalia nyingine, endelea kuzituma
+          if (queue.length > 0) {
+            syncPendingQueue();
+          }
+        }
+      } catch (err) {
+        console.error("Échec de la synchronisation offline:", err);
+      }
+    }
+
+    function saveToGallery(prompt, url) {
+      let gallery = JSON.parse(localStorage.getItem('byaoia_gallery')) || [];
+      gallery.unshift({ prompt: prompt, style: selectedStyle, url: url, date: new Date().toLocaleDateString() });
+      localStorage.setItem('byaoia_gallery', JSON.stringify(gallery));
+    }
+
+    function renderGallery() {
+      const container = document.getElementById('gallery-container');
+      const gallery = JSON.parse(localStorage.getItem('byaoia_gallery')) || [];
+
+      if (gallery.length === 0) {
+        container.innerHTML = `<p style="grid-column: span 2; text-align: center; color: var(--text-muted); padding: 30px; font-size:0.85rem;">Aucune création pour le moment.</p>`;
+        return;
+      }
+
+      container.innerHTML = gallery.map(item => `
+        <div class="gallery-card">
+          <img src="${item.url}" alt="${item.prompt}">
+          <div class="gallery-card-info">
+            <p style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.prompt}</p>
+            <p style="color: var(--text-muted); font-size: 0.7rem;">${item.style} • ${item.date}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function clearGallery() {
+      localStorage.removeItem('byaoia_gallery');
+      renderGallery();
+      showToast("Historique effacé.");
+    }
+
+    function downloadCurrentImage() {
+      if (currentGeneratedImageUrl) {
+        window.open(currentGeneratedImageUrl, '_blank');
+        showToast("Ouverture de l'image...");
+      }
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      showToast(`Copié : ${text}`);
+    }
+  </script>
+</body>
+</html>
+
