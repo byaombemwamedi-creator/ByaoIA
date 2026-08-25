@@ -422,7 +422,7 @@
   </div>
 
   <script>
-    const SUPABASE_FUNCTION_URL = "https://pxwezksplsqeonhkfdyx.supabase.co/functions/v1/generate-image";
+    const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
     let selectedStyle = "Photoréaliste";
     let currentGeneratedImageUrl = "";
 window.onload = function() { 
@@ -558,7 +558,7 @@ window.onload = function() {
       document.getElementById('loading-modal').style.display = "flex";
 
       try {
-        const response = await fetch(SUPABASE_FUNCTION_URL, {
+        const response = await fetch(AI_BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -568,7 +568,6 @@ window.onload = function() {
             timestamp: new Date().toISOString()
           })
         });
-
 
         const data = await response.json();
         document.getElementById('loading-modal').style.display = "none";
