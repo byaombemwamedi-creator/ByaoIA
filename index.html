@@ -531,16 +531,64 @@
       if (viewId === 'view-gallery') renderGallery();
     }
 
-    function watchAdForCredits() {
-      showToast("Chargement de la publicité...");
-      setTimeout(() => {
-        let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
-        localStorage.setItem('byaoia_credits', credits);
-        const creditEl = document.getElementById('user-credits');
-        if (creditEl) creditEl.innerText = credits;
-        showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
-      }, 2000);
-    }
+        function watchAdForCredits() {
+  const loaderSub = document.getElementById('loader-subtitle');
+  if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
+  const loadModal = document.getElementById('loading-modal');
+  if (loadModal) loadModal.style.display = "flex";
+
+  // Tunakagua kama upo ndani ya AndroidIDE (Native WebView ya Android)
+  if (window.AndroidBridge && typeof window.AndroidBridge.showRewardedAd === 'function') {
+    // Tunaita kitendakazi cha Android kuonesha tangazo la AdMob Rewarded Ad
+    window.AndroidBridge.showRewardedAd();
+  } else {
+    // Hii ni simulation kwa ajili ya kivinjari cha kawaida (Browser)
+    setTimeout(() => {
+      if (loadModal) loadModal.style.display = "none";
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+      localStorage.setItem('byaoia_credits', credits);
+      const creditEl = document.getElementById('user-credits');
+      if (creditEl) creditEl.innerText = credits;
+      showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+    }, 2000);
+  }
+}
+
+// Kitendakazi hiki kitaitwa moja kwa moja kutoka kwenye MainActivity.kt ya Android
+// pale tu mtakapothibitisha kuwa ametazama tangazo kikamilifu.
+function grantAdRewardFromNative() {
+  // Tunaficha modal ya kupakia/kutazama tangazo
+  const loadModal = document.getElementById('loading-modal');
+  if (loadModal) loadModal.style.display = "none";
+
+  // Tunaongeza mikopo (credits) kwenye localStorage (Unaweza kubadilisha 2 na idadi unayotaka)
+  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+  localStorage.setItem('byaoia_credits', credits);
+  
+  // Tunasasisha muonekano kwenye ukurasa (UI) kama element ipo
+  const creditEl = document.getElementById('user-credits');
+  if (creditEl) creditEl.innerText = credits;
+
+  // Tunatoa taarifa ya mafanikio kwa mtumiaji
+  showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+}
+
+// Kitendakazi cha kupokea ujumbe wa makosa (kama tangazo limeshindwa kupakia au kutokea tatizo)
+function showToast(message) {
+  // Unaweza kubadilisha hii kuwa mfumo wako wa arifa (Toast/Snackbar) kama upo
+  console.log(message);
+  
+  // Hakikisha modal ya kupakia inafungwa ili mtumiaji asiangalie skuni imeganda
+  const loadModal = document.getElementById('loading-modal');
+  if (loadModal) loadModal.style.display = "none";
+  
+  // Mfano wa kuonyesha ujumbe kwenye alert au element maalum kama unayo
+  if (typeof alertBox === 'function') {
+    alertBox(message);
+  } else {
+    // alert(message); // Weka hii kama unataka ionekane kama Pop-up ya haraka
+  }
+}
 
         async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
