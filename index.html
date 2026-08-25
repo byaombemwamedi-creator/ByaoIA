@@ -413,7 +413,7 @@
   </div>
 
   <script>
-    const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/r5srrcpk6o5w6qzrwpsygob3ckinfxf7";
+    const SUPABASE_FUNCTION_URL = "https://pxwezksplsqeonhkfdyx.supabase.co/functions/v1/generate-image";
     let selectedStyle = "Photoréaliste";
     let currentGeneratedImageUrl = "";
 
@@ -538,7 +538,7 @@
       document.getElementById('loading-modal').style.display = "flex";
 
       try {
-        const response = await fetch(MAKE_WEBHOOK_URL, {
+        const response = await fetch(SUPABASE_FUNCTION_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -548,6 +548,7 @@
             timestamp: new Date().toISOString()
           })
         });
+
 
         const data = await response.json();
         document.getElementById('loading-modal').style.display = "none";
