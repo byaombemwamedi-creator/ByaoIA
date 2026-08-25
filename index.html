@@ -542,7 +542,7 @@
       }, 2000);
     }
 
-    async function generateImage() {
+        async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       const promptInput = document.getElementById('prompt-input');
       const promptText = promptInput ? promptInput.value.trim() : "";
@@ -569,7 +569,11 @@
 
         const data = await response.json();
         if (loadModal) loadModal.style.display = "none";
-        const imageUrl = data.image_url || data.url || (data.data && data.data.url);
+        
+        console.log("Majibu ya Backend:", data); // Hii itakusaidia kuona ukifungua F12 kwenye browser
+
+        // Inatafuta URL kwenye njia zote zinazowezekana za JSON
+        const imageUrl = data.image_url || data.url || data.output || (data.data && data.data.url) || (Array.isArray(data) && data[0]);
 
         if (imageUrl) {
           credits -= 1;
@@ -588,13 +592,17 @@
           showToast("Image générée avec succès !");
           if (promptInput) promptInput.value = "";
         } else {
-          showToast("Erreur : Aucune image reçue.");
+          // Kama kuna ujumbe maalum wa kosa kutoka backend, utaonekana hapa
+          const errorMsg = data.error || data.message || "Aucune image reçue.";
+          showToast("Erreur: " + errorMsg);
         }
       } catch (err) {
         if (loadModal) loadModal.style.display = "none";
+        console.error("Fetch error:", err);
         showToast("Erreur de connexion au serveur.");
       }
     }
+
 
     function saveToGallery(prompt, url) {
       let gallery = JSON.parse(localStorage.getItem('byaoia_gallery')) || [];
