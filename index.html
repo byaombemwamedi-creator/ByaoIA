@@ -80,22 +80,192 @@
     #toast-notification { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; border: 1px solid var(--primary); padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; text-align: center; white-space: nowrap; }
     #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    .payment-box { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+    :root {
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #ec4899;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body { 
+      background-color: var(--bg-dark); 
+      color: var(--text-light); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      min-height: 100vh; 
+      width: 100vw;
+      margin: 0;
+      overflow: hidden;
+    }
+    
+    /* Ukurasa unajaa skrini nzima kwenye simu, tablet, na kompyuta */
+    .app-screen { 
+      width: 100vw; 
+      max-width: 100%; 
+      height: 100vh; 
+      max-height: 100vh;
+      background-color: #0b0f19; 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+      overflow: hidden; 
+      animation: fadeInApp 0.6s ease-out forwards;
+    }
+
+    /* Kwenye Kompyuta na Tablet kubwa, tunaweka mpangilio mpana unaojaa vizuri bila kupoteza nafasi */
+    @media (min-width: 768px) {
+      .app-screen {
+        border-left: 1px solid #1e293b;
+        border-right: 1px solid #1e293b;
+      }
+      /* Unaweza kuweka mpangilio wa ndani kujaa vizuri zaidi kwenye skrini kubwa */
+      .view {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .view {
+        max-width: 950px;
+      }
+    }
+
+    .view { 
+      display: none; 
+      flex-direction: column; 
+      height: 100%; 
+      padding: 24px; 
+      overflow-y: auto; 
+      padding-bottom: 95px; 
+      animation: fadeInView 0.35s ease-in-out;
+    }
+    .view.active { display: flex; }
+
+    @keyframes fadeInApp {
+      from { opacity: 0; transform: scale(0.99); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Auth & Login Screen */
+    .auth-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; padding: 20px; }
+    .auth-logo { width: 95px; height: 95px; margin-bottom: 20px; filter: drop-shadow(0 8px 16px rgba(139,92,246,0.4)); animation: floatLogo 3s ease-in-out infinite; }
+    
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .btn-google { background: #ffffff; color: #1e293b; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; transition: 0.2s; }
+    .btn-google:hover { background: #f1f5f9; transform: translateY(-1px); }
+    
+    .divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); margin: 15px 0; font-size: 0.8rem; width: 100%; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #334155; }
+    .divider::before { margin-right: .5em; }
+    .divider::after { margin-left: .5em; }
+
+    /* Header & Balance */
+    .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .logo-container { display: flex; align-items: center; gap: 10px; }
+    .header-logo { width: 34px; height: 34px; }
+    .logo-badge { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.3rem; }
+    
+    .credit-badge { 
+      background: #1e1b4b; 
+      border: 1px solid var(--primary); 
+      padding: 7px 14px; 
+      border-radius: 20px; 
+      font-size: 0.85rem; 
+      font-weight: bold; 
+      color: #c084fc; 
+      display: flex; 
+      align-items: center; 
+      gap: 6px; 
+      cursor: pointer; 
+      transition: 0.3s;
+    }
+    .credit-badge:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(139,92,246,0.4); }
+
+    /* Network Status Indicator */
+    #connection-status { padding: 9px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; margin-bottom: 14px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .status-online { background: #064e3b22; color: var(--success); border: 1px solid var(--success); }
+    .status-offline { background: #7f1d1d22; color: #ef4444; border: 1px solid #ef4444; }
+
+    /* Form Inputs */
+    textarea, input { width: 100%; background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; color: #fff; font-size: 0.95rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
+    textarea { resize: none; height: 120px; }
+    textarea:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(139,92,246,0.3); }
+    
+    .btn { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+    .btn:hover { opacity: 0.92; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(139,92,246,0.3); }
+    .btn-secondary { background: #334155; margin-top: 8px; }
+    .btn-secondary:hover { background: #475569; }
+
+    /* Style Tags */
+    .style-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .style-option { background: var(--card-bg); border: 1px solid #334155; border-radius: 10px; padding: 12px 6px; text-align: center; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+    .style-option:hover { border-color: var(--primary); color: #fff; transform: translateY(-1px); }
+    .style-option.active { border-color: var(--accent); background: #2d1b4e; color: #fff; font-weight: bold; }
+
+    /* Image Display Area */
+    .result-container { background: var(--card-bg); border: 1px dashed #334155; border-radius: 16px; min-height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
+    .result-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; animation: zoomIn 0.35s ease; }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Pricing Plans Cards */
+    .pricing-card { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .pricing-card:hover { border-color: var(--primary); transform: translateX(3px); }
+    .pricing-card.featured { border-color: var(--success); background: #064e3b22; }
+
+    /* Gallery Grid: Inajaa vizuri kwenye skrini kubwa */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+    .gallery-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #334155; transition: 0.2s; }
+    .gallery-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+    .gallery-card img { width: 100%; height: 140px; object-fit: cover; }
+    .gallery-card-info { padding: 10px; font-size: 0.8rem; }
+
+    /* Toast Notification */
+    #toast-notification { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; border: 1px solid var(--primary); padding: 10px 22px; border-radius: 30px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; text-align: center; white-space: nowrap; }
+    #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .payment-box { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; margin-bottom: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
+    .payment-box:hover { border-color: #38bdf8; }
     .payment-box span { font-weight: bold; font-size: 0.85rem; color: #38bdf8; }
     .payment-box p { font-size: 0.8rem; color: #94a3b8; }
-    .copy-btn { background: #334155; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; }
+    .copy-btn { background: #334155; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+    .copy-btn:hover { background: var(--primary); }
 
     .social-links { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-    .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; font-size: 0.85rem; }
+    .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; font-size: 0.85rem; transition: 0.2s; }
+    .social-btn:hover { transform: scale(1.01); }
 
-    /* Bottom Navigation */
+    /* Bottom Navigation: Inajaa upana wote chini kwenye vifaa vyote */
     .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 12px 0; z-index: 10; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--text-muted); cursor: pointer; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .nav-item:hover { color: var(--text-light); }
     .nav-item.active { color: var(--primary); font-weight: bold; }
-    .nav-icon { font-size: 1.3rem; margin-bottom: 2px; }
+    .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
 
     .spinner { width: 40px; height: 40px; border: 4px solid #334155; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
   </style>
 </head>
 <body>
