@@ -19,79 +19,6 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-light); display: flex; justify-content: center; min-height: 100vh; }
-    
-    .app-screen { width: 100%; max-width: 430px; background-color: #0b0f19; display: flex; flex-direction: column; height: 100vh; position: relative; overflow: hidden; }
-
-    .view { display: none; flex-direction: column; height: 100%; padding: 18px; overflow-y: auto; padding-bottom: 80px; }
-    .view.active { display: flex; }
-
-    /* Auth & Login Screen */
-    .auth-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center; padding: 20px; }
-    .auth-logo { width: 90px; height: 90px; margin-bottom: 20px; filter: drop-shadow(0 8px 16px rgba(139,92,246,0.4)); }
-    .btn-google { background: #ffffff; color: #1e293b; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
-    .btn-google:hover { background: #f1f5f9; }
-    .divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); margin: 15px 0; font-size: 0.8rem; width: 100%; }
-    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #334155; }
-    .divider::before { margin-right: .5em; }
-    .divider::after { margin-left: .5em; }
-
-    /* Header & Balance */
-    .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .logo-container { display: flex; align-items: center; gap: 10px; }
-    .header-logo { width: 32px; height: 32px; }
-    .logo-badge { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.2rem; }
-    .credit-badge { background: #1e1b4b; border: 1px solid var(--primary); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; color: #c084fc; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-
-    /* Network Status Indicator */
-    #connection-status { padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; margin-bottom: 12px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .status-online { background: #064e3b22; color: var(--success); border: 1px solid var(--success); }
-    .status-offline { background: #7f1d1d22; color: #ef4444; border: 1px solid #ef4444; }
-
-    /* Form Inputs */
-    textarea, input { width: 100%; background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; color: #fff; font-size: 0.95rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
-    textarea { resize: none; height: 110px; }
-    textarea:focus, input:focus { border-color: var(--primary); }
-    
-    .btn { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-    .btn:hover { opacity: 0.9; }
-    .btn-secondary { background: #334155; margin-top: 8px; }
-
-    /* Style Tags */
-    .style-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-    .style-option { background: var(--card-bg); border: 1px solid #334155; border-radius: 8px; padding: 10px 4px; text-align: center; font-size: 0.75rem; cursor: pointer; color: var(--text-muted); }
-    .style-option.active { border-color: var(--accent); background: #2d1b4e; color: #fff; font-weight: bold; }
-
-    /* Image Display Area */
-    .result-container { background: var(--card-bg); border: 1px dashed #334155; border-radius: 16px; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
-    .result-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
-
-    /* Pricing Plans Cards */
-    .pricing-card { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .pricing-card.featured { border-color: var(--success); background: #064e3b22; }
-
-    /* Gallery Grid */
-    .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .gallery-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #334155; }
-    .gallery-card img { width: 100%; height: 130px; object-fit: cover; }
-    .gallery-card-info { padding: 8px; font-size: 0.75rem; }
-
-    /* Toast Notification */
-    #toast-notification { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; border: 1px solid var(--primary); padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; text-align: center; white-space: nowrap; }
-    #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    :root {
-      --primary: #8b5cf6;
-      --primary-hover: #7c3aed;
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --text-light: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #ec4899;
-      --success: #10b981;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     
     body { 
       background-color: var(--bg-dark); 
@@ -105,7 +32,7 @@
       overflow: hidden;
     }
     
-    /* Ukurasa unajaa skrini nzima kwenye simu, tablet, na kompyuta */
+    /* Skrini inajaa vizuri kwenye simu, tablet, na kompyuta */
     .app-screen { 
       width: 100vw; 
       max-width: 100%; 
@@ -119,13 +46,11 @@
       animation: fadeInApp 0.6s ease-out forwards;
     }
 
-    /* Kwenye Kompyuta na Tablet kubwa, tunaweka mpangilio mpana unaojaa vizuri bila kupoteza nafasi */
     @media (min-width: 768px) {
       .app-screen {
         border-left: 1px solid #1e293b;
         border-right: 1px solid #1e293b;
       }
-      /* Unaweza kuweka mpangilio wa ndani kujaa vizuri zaidi kwenye skrini kubwa */
       .view {
         max-width: 800px;
         margin: 0 auto;
@@ -209,7 +134,8 @@
     textarea { resize: none; height: 120px; }
     textarea:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(139,92,246,0.3); }
     
-     .btn { 
+    /* Kitufe Kikuu chenye Glow Animation */
+    .btn { 
       width: 100%; 
       background: linear-gradient(135deg, var(--primary), var(--primary-hover)); 
       color: white; 
@@ -224,7 +150,7 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
       animation: pulseGlow 3s infinite;
-     }
+    }
     @keyframes pulseGlow {
       0% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
       50% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.5); }
@@ -235,8 +161,10 @@
       transform: translateY(-2px) scale(1.01); 
       opacity: 0.95; 
     }
+    .btn-secondary { background: #334155; margin-top: 8px; animation: none; box-shadow: none; }
 
-    /* 2. Style Option inaruka kwa uzuri inapochaguliwa (Bounce) */
+    /* Style Selector & Bounce Animation */
+    .style-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
     .style-option { 
       background: var(--card-bg); 
       border: 1px solid #334155; 
@@ -269,7 +197,7 @@
       100% { transform: scale(1); }
     }
 
-    /* 3. Shimmer Animation wakati wa kupakia (Skeleton Loading) */
+    /* Shimmer Animation wakati wa kupakia */
     @keyframes shimmer {
       0% { background-position: -200% 0; }
       100% { background-position: 200% 0; }
@@ -280,11 +208,6 @@
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
-    /* Style Tags */
-    .style-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-    .style-option { background: var(--card-bg); border: 1px solid #334155; border-radius: 10px; padding: 12px 6px; text-align: center; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-    .style-option:hover { border-color: var(--primary); color: #fff; transform: translateY(-1px); }
-    .style-option.active { border-color: var(--accent); background: #2d1b4e; color: #fff; font-weight: bold; }
 
     /* Image Display Area */
     .result-container { background: var(--card-bg); border: 1px dashed #334155; border-radius: 16px; min-height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
@@ -300,7 +223,7 @@
     .pricing-card:hover { border-color: var(--primary); transform: translateX(3px); }
     .pricing-card.featured { border-color: var(--success); background: #064e3b22; }
 
-    /* Gallery Grid: Inajaa vizuri kwenye skrini kubwa */
+    /* Gallery Grid */
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
     .gallery-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid #334155; transition: 0.2s; }
     .gallery-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
@@ -322,7 +245,7 @@
     .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 10px; text-decoration: none; color: white; font-weight: bold; font-size: 0.85rem; transition: 0.2s; }
     .social-btn:hover { transform: scale(1.01); }
 
-    /* Bottom Navigation: Inajaa upana wote chini kwenye vifaa vyote */
+    /* Bottom Navigation */
     .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #0f172a; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; padding: 12px 0; z-index: 10; }
     .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
     .nav-item:hover { color: var(--text-light); }
@@ -332,6 +255,8 @@
     .spinner { width: 40px; height: 40px; border: 4px solid #334155; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+    /* Eneo la Matangazo ya Nje (Monetization Ad Banner) */
+    .ad-banner-box { background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px dashed var(--primary); border-radius: 10px; padding: 10px; text-align: center; margin-bottom: 14px; font-size: 0.75rem; color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -344,7 +269,6 @@
     <!-- VUE 0 : AUTHENTIFICATION -->
     <div id="view-auth" class="view active">
       <div class="auth-container">
-        <!-- SVG LOGO OFFICIEL BYAOIA -->
         <svg class="auth-logo" viewBox="0 0 512 512">
           <defs>
             <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -394,11 +318,15 @@
 
     <!-- VUE 1 : GÉNÉRATEUR -->
     <div id="view-generate" class="view">
-      <!-- KITAMBUZI CHA MTANDAO (NETWORK STATUS) -->
+      <!-- KITAMBUZI CHA MTANDAO -->
       <div id="connection-status" class="status-online">Inachunguza mtandao...</div>
 
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
+      <!-- Eneo la Matangazo ya Nje (Monetization Banner Space) -->
+      <div class="ad-banner-box">
+        📢 Espace Publicitaire / Sponsor (ByyaoIA Ads)
+      </div>
 
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
       <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
 
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Choisir un style :</p>
@@ -435,7 +363,7 @@
 
     <!-- VUE 3 : RECHARGE & PAIEMENT -->
     <div id="view-recharge" class="view">
-      <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits</h3>
+      <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits & Monétisation</h3>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Choisissez votre formule économique :</p>
 
       <div class="pricing-card">
@@ -452,6 +380,13 @@
           <p style="font-size: 0.75rem; color: var(--text-muted);">60 Crédits + Support Prioritaire</p>
         </div>
         <p style="font-weight: bold; color: var(--success);">10 000 FC / 12 000 FBu</p>
+      </div>
+
+      <!-- Matangazo ya Ndani ya Tazama Video upate Credits (Rewarded Ads Simulation) -->
+      <div style="background: #1e1b4b; border: 1px solid var(--primary); border-radius: 12px; padding: 14px; margin-bottom: 14px; text-align: center;">
+        <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
+        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (AdMob)</button>
       </div>
 
       <p style="font-size: 0.8rem; color: var(--text-muted); margin: 12px 0 6px 0;">Effectuez le paiement via :</p>
@@ -500,7 +435,7 @@
     </div>
 
     <!-- LOADER MODAL -->
-    <div id="loading-modal" class="modal-overlay" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
+    <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
       <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
         <div class="spinner"></div>
         <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Création en cours...</h3>
@@ -521,7 +456,6 @@
       checkPendingQueue();
     };
 
-    // Kusikiliza mabadiliko ya mtandao (Online / Offline Events)
     window.addEventListener('online', () => {
       updateNetworkStatus();
       showToast("Mtandao umerudi! Inasawazisha maombi...");
@@ -540,7 +474,7 @@
         statusEl.innerHTML = "🟢 vous êtes en ligne (Online Mode)";
       } else {
         statusEl.className = "status-offline";
-        statusEl.innerHTML = "🔴 pas de connexion(Offline - votre requête est bien sauvegardee)";
+        statusEl.innerHTML = "🔴 pas de connexion (Offline - requête sauvegardée)";
       }
     }
 
@@ -618,7 +552,17 @@
       if (viewId === 'view-gallery') renderGallery();
     }
 
-    // UTENDAJI WA KUTENGENEZA PICHA (HYBRID: ONLINE & OFFLINE QUEUE)
+    // Mfumo wa Rewarded Ad kwa ajili ya kuongeza mikopo ya bure
+    function watchAdForCredits() {
+      showToast("Chargement de la publicité...");
+      setTimeout(() => {
+        let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+        localStorage.setItem('byaoia_credits', credits);
+        document.getElementById('user-credits').innerText = credits;
+        showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+      }, 2000);
+    }
+
     async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       const promptText = document.getElementById('prompt-input').value.trim();
@@ -626,13 +570,11 @@
       if (!promptText) { showToast("Veuillez décrire votre image."); return; }
       if (credits < 1) { showToast("Crédits épuisés. Redirection..."); switchView('view-recharge'); return; }
 
-      // KAMA HAKUNA MTANDAO: Hifadhi kwenye LocalStorage (Offline Queue)
       if (!navigator.onLine) {
         saveToOfflineQueue(promptText);
         return;
       }
 
-      // KAMA KUNA MTANDAO: Tuma moja kwa moja kwenye Make Webhook
       document.getElementById('loader-subtitle').innerText = "L'IA façonne votre image...";
       document.getElementById('loading-modal').style.display = "flex";
 
@@ -667,12 +609,10 @@
         }
       } catch (err) {
         document.getElementById('loading-modal').style.display = "none";
-        // Kama kosa limetokea ghafla wakati wa kutuma, lihifadhi offline
         saveToOfflineQueue(promptText);
       }
     }
 
-    // Kuhifadhi ombi kwenye kumbukumbu ya simu kukiwa hakuna mtandao
     function saveToOfflineQueue(prompt) {
       let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
       queue.push({ prompt: prompt, style: selectedStyle, date: new Date().toLocaleTimeString() });
@@ -682,7 +622,6 @@
       showToast("💾 Pas de réseau. Requête sauvegardée localement !");
     }
 
-    // Kuangalia kama kuna maombi yaliyosubiri
     function checkPendingQueue() {
       let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
       if (queue.length > 0 && navigator.onLine) {
@@ -690,14 +629,11 @@
       }
     }
 
-    // Kusawazisha data zilizokuwa offline pale mtandao unaporudi
     async function syncPendingQueue() {
       let queue = JSON.parse(localStorage.getItem('byaoia_offline_queue')) || [];
       if (queue.length === 0 || !navigator.onLine) return;
 
       showToast(`Synchronisation de ${queue.length} requête(s)...`);
-      
-      // Chukua ombi la kwanza
       let currentReq = queue[0];
       
       try {
@@ -716,27 +652,19 @@
         const imageUrl = data.image_url || data.url || (data.data && data.data.url);
 
         if (imageUrl) {
-          // Punguza krediti
           let credits = parseInt(localStorage.getItem('byaoia_credits') || "1") - 1;
           localStorage.setItem('byaoia_credits', Math.max(0, credits));
           document.getElementById('user-credits').innerText = localStorage.getItem('byaoia_credits');
           
-          // Hifadhi kwenye gallery
           saveToGallery(currentReq.prompt, imageUrl);
-          
-          // Ondoa kwenye foleni ya offline
           queue.shift();
           localStorage.setItem('byaoia_offline_queue', JSON.stringify(queue));
           
-          showToast("Synchronisation réussie ! Image ajoutée à la galerie.");
-          
-          // Kama zimesalia nyingine, endelea kuzituma
-          if (queue.length > 0) {
-            syncPendingQueue();
-          }
+          showToast("Synchronisation réussie !");
+          if (queue.length > 0) { syncPendingQueue(); }
         }
       } catch (err) {
-        console.error("Échec de la synchronisation offline:", err);
+        console.error("Échec de la synchronisation:", err);
       }
     }
 
@@ -786,4 +714,3 @@
   </script>
 </body>
 </html>
-
