@@ -348,6 +348,24 @@
         </div>
       </div>
     </div>
+        <!-- Screen ya AI Chatbot (Sasa ni ukurasa wake kamili unaofunguka kupitia Menu ya chini) -->
+    <div id="view-chat" class="view">
+      <div style="font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-bottom: 12px;">ByaoIA AI Assistant</div>
+      
+      <div id="chat-container">
+        <div class="chat-message ai-msg">
+          Jambo! Mimi ni ByaoIA AI yako. Nikuvisaidie nini leo?
+          <div class="ai-actions">
+            <button onclick="copyChatText('welcome-msg-txt')">📋 Nakili</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input-box">
+        <input type="text" id="user-chat-input" placeholder="Andika swali lako hapa..." onkeypress="handleChatKeyPress(event)">
+        <button class="chat-send-btn" id="send-chat-btn">Tuma</button>
+      </div>
+    </div>
 
     <!-- Screen ya Kutengeneza Picha (Generate View) -->
     <div id="view-generate" class="view">
