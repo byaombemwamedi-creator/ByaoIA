@@ -354,9 +354,10 @@
       
       <div id="chat-container">
         <div class="chat-message ai-msg">
-          Bonjour! Moi c'est ByaoIA. comment puis-je t'aider?
+          <div id="welcome-msg-txt">Bonjour! Moi c'est ByaoIA. comment puis-je t'aider?</div>
           <div class="ai-actions">
-            <button onclick="copyChatText('welcome-msg-txt')">📋 copier</button>
+            <button onclick="copyChatText('welcome-msg-txt')">📋 Copier</button>
+            <button onclick="retryMessage('Bonjour! Moi c'est ByaoIA. comment puis-je t'aider?')">🔄 Réessayer</button>
           </div>
         </div>
       </div>
@@ -366,6 +367,7 @@
         <button class="chat-send-btn" id="send-chat-btn">Envoyer</button>
       </div>
     </div>
+
 
     <!-- Screen ya Kutengeneza Picha (Generate View) -->
     <div id="view-generate" class="view">
@@ -624,7 +626,8 @@
       if (viewId === 'view-gallery') renderGallery();
     }
        // --- AI CHATBOT LOGIC ---
-    async function sendChatMessage(promptText = null) {
+    
+     async function sendChatMessage(promptText = null) {
         const inputField = document.getElementById("user-chat-input");
         const chatContainer = document.getElementById("chat-container");
         const prompt = promptText || inputField.value.trim();
@@ -632,7 +635,17 @@
         if (!prompt) return;
 
         lastUserPrompt = prompt;
-        chatContainer.innerHTML += `<div class="chat-message user-msg">${escapeHtml(prompt)}</div>`;
+        
+        // 1. Tumeongeza kitufe cha "Modifier" kwenye ujumbe wa mteja
+        const escapedPrompt = escapeHtml(prompt);
+        chatContainer.innerHTML += `
+            <div class="chat-message user-msg">
+                ${escapedPrompt}
+                <div style="margin-top: 6px; font-size: 11px; text-align: right;">
+                    <button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️ Modifier</button>
+                </div>
+            </div>`;
+            
         if (!promptText) {
             inputField.value = "";
         }
@@ -643,7 +656,7 @@
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
             
             const response = await fetch(url, {
                 method: "POST",
@@ -667,12 +680,13 @@
             const msgId = "msg-" + Date.now();
             const containerId = "container-" + Date.now();
             
+            // 2. Kwenye jibu la AI tumeweka vitufe vya "Copier" na "Réessayer" kwa Kifaransa
             chatContainer.innerHTML += `
                 <div id="${containerId}" class="chat-message ai-msg">
                     <div id="${msgId}"></div>
                     <div class="ai-actions">
-                        <button onclick="copyChatText('${msgId}')">📋 Nakili</button>
-                        <button onclick="retryChatMessage()">🔄 Jaribu Tena</button>
+                        <button onclick="copyChatText('${msgId}')">📋 Copier</button>
+                        <button onclick="retryChatMessage()">🔄 Réessayer</button>
                     </div>
                 </div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -708,6 +722,15 @@
             
             chatContainer.innerHTML += `<div class="chat-message error-msg">Kosa: ${error.message}</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    }
+
+    // 3. Ongeza hii function ya kusimamia kitufe cha Modifier
+    function editUserMessage(text) {
+        const inputField = document.getElementById("user-chat-input");
+        if (inputField) {
+            inputField.value = text;
+            inputField.focus();
         }
     }
 
