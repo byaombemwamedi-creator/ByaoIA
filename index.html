@@ -82,14 +82,6 @@
       50% { transform: translateY(-8px); }
     }
 
-    .btn-google { background: #ffffff; color: #1e293b; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; transition: 0.2s; }
-    .btn-google:hover { background: #f1f5f9; transform: translateY(-1px); }
-    
-    .divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); margin: 15px 0; font-size: 0.8rem; width: 100%; }
-    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #334155; }
-    .divider::before { margin-right: .5em; }
-    .divider::after { margin-left: .5em; }
-
     /* Header & Balance */
     .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
     .logo-container { display: flex; align-items: center; gap: 10px; }
@@ -231,26 +223,8 @@
 
     <div id="toast-notification">Notification</div>
 
+    <!-- Screen ya Kuingia (Auth View) -->
     <div id="view-auth" class="view active">
-      <div class="auth-container">
-        <svg class="auth-logo" viewBox="0 0 512 512">
-          <defs>
-            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#8b5cf6" />
-              <stop offset="50%" stop-color="#d946ef" />
-              <stop offset="100%" stop-color="#ec4899" />
-            </linearGradient>
-          </defs>
-          <rect width="512" height="512" rx="115" fill="#0f172a"/>
-          <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#bgGrad)" stroke-width="6" opacity="0.4"/>
-          <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z M220 170 V230 H255 C275 230 290 220 290 200 C290 180 275 170 255 170 H220 Z M220 280 V350 H265 C288 350 302 338 302 315 C302 292 288 280 265 280 H220 Z" fill="url(#bgGrad)"/>
-          <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ffffff"/>
-        </svg>
-
-        <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Pro</h1>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Votre Suite Créative d'Intelligence Artificielle.</p>
-        
-            <div id="view-auth" class="view active">
       <div class="auth-container">
         <svg class="auth-logo" viewBox="0 0 512 512">
           <defs>
@@ -269,16 +243,13 @@
         <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Pro</h1>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Votre Suite Créative d'Intelligence Artificielle.</p>
         
-        <!-- Sehemu ya kuingia iliyorahisishwa bila Google ya uongo -->
         <input type="email" id="auth-email" placeholder="Votre adresse email">
         <input type="text" id="auth-name" placeholder="Votre nom complet">
         <button class="btn" onclick="loginWithEmail()">Se connecter / S'inscrire</button>
       </div>
     </div>
 
-
-        <div class="divider">ou avec votre email</div>
-
+    <!-- Header ya Juu -->
     <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
       <div class="app-header">
         <div class="logo-container">
@@ -295,6 +266,7 @@
       </div>
     </div>
 
+    <!-- Screen ya Kutengeneza Picha (Generate View) -->
     <div id="view-generate" class="view">
       <div id="connection-status" class="status-online">Inachunguza mtandao...</div>
 
@@ -334,6 +306,7 @@
       </div>
     </div>
 
+    <!-- Screen ya Galerie -->
     <div id="view-gallery" class="view">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h3 style="font-size: 1.1rem;">Mes Créations</h3>
@@ -342,6 +315,7 @@
       <div class="gallery-grid" id="gallery-container"></div>
     </div>
 
+    <!-- Screen ya Recharge -->
     <div id="view-recharge" class="view">
       <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits & Monétisation</h3>
       <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Choisissez votre formule économique :</p>
@@ -385,6 +359,7 @@
       </a>
     </div>
 
+    <!-- Screen ya Contact -->
     <div id="view-contact" class="view">
       <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Communauté & Support</h3>
       <div class="social-links">
@@ -398,6 +373,7 @@
       </div>
     </div>
 
+    <!-- Menu ya Chini (Bottom Navigation) -->
     <div class="bottom-nav" id="bottom-navigation" style="display: none;">
       <div class="nav-item active" onclick="switchView('view-generate')"><span class="nav-icon">✨</span>Créer</div>
       <div class="nav-item" onclick="switchView('view-gallery')"><span class="nav-icon">🖼️</span>Galerie</div>
@@ -405,6 +381,7 @@
       <div class="nav-item" onclick="switchView('view-contact')"><span class="nav-icon">🌐</span>Contacts</div>
     </div>
 
+    <!-- Modal ya Loading / Subira Kidogo -->
     <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%;background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
       <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
         <div class="spinner"></div>
@@ -465,6 +442,10 @@
         toast.classList.add('show');
         setTimeout(() => { toast.classList.remove('show'); }, 3000);
       }
+      
+      // Hakikisha modal ya kupakia inafungwa kama kulikuwa na tatizo
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "none";
     }
 
     function checkUserSession() {
@@ -539,66 +520,43 @@
       if (viewId === 'view-gallery') renderGallery();
     }
 
-        function watchAdForCredits() {
-  const loaderSub = document.getElementById('loader-subtitle');
-  if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
-  const loadModal = document.getElementById('loading-modal');
-  if (loadModal) loadModal.style.display = "flex";
+    function watchAdForCredits() {
+      const loaderSub = document.getElementById('loader-subtitle');
+      if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "flex";
 
-  // Tunakagua kama upo ndani ya AndroidIDE (Native WebView ya Android)
-  if (window.AndroidBridge && typeof window.AndroidBridge.showRewardedAd === 'function') {
-    // Tunaita kitendakazi cha Android kuonesha tangazo la AdMob Rewarded Ad
-    window.AndroidBridge.showRewardedAd();
-  } else {
-    // Hii ni simulation kwa ajili ya kivinjari cha kawaida (Browser)
-    setTimeout(() => {
+      // Tunakagua kama upo ndani ya AndroidIDE (Native WebView ya Android)
+      if (window.AndroidBridge && typeof window.AndroidBridge.showRewardedAd === 'function') {
+        window.AndroidBridge.showRewardedAd();
+      } else {
+        // Simulation kwa ajili ya browser ya kawaida
+        setTimeout(() => {
+          if (loadModal) loadModal.style.display = "none";
+          let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+          localStorage.setItem('byaoia_credits', credits);
+          const creditEl = document.getElementById('user-credits');
+          if (creditEl) creditEl.innerText = credits;
+          showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+        }, 2000);
+      }
+    }
+
+    // Kitendakazi kinachoitwa kutoka kwenye MainActivity.kt ya Android
+    function grantAdRewardFromNative() {
+      const loadModal = document.getElementById('loading-modal');
       if (loadModal) loadModal.style.display = "none";
+
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
       localStorage.setItem('byaoia_credits', credits);
+      
       const creditEl = document.getElementById('user-credits');
       if (creditEl) creditEl.innerText = credits;
+
       showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
-    }, 2000);
-  }
-}
+    }
 
-// Kitendakazi hiki kitaitwa moja kwa moja kutoka kwenye MainActivity.kt ya Android
-// pale tu mtakapothibitisha kuwa ametazama tangazo kikamilifu.
-function grantAdRewardFromNative() {
-  // Tunaficha modal ya kupakia/kutazama tangazo
-  const loadModal = document.getElementById('loading-modal');
-  if (loadModal) loadModal.style.display = "none";
-
-  // Tunaongeza mikopo (credits) kwenye localStorage (Unaweza kubadilisha 2 na idadi unayotaka)
-  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
-  localStorage.setItem('byaoia_credits', credits);
-  
-  // Tunasasisha muonekano kwenye ukurasa (UI) kama element ipo
-  const creditEl = document.getElementById('user-credits');
-  if (creditEl) creditEl.innerText = credits;
-
-  // Tunatoa taarifa ya mafanikio kwa mtumiaji
-  showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
-}
-
-// Kitendakazi cha kupokea ujumbe wa makosa (kama tangazo limeshindwa kupakia au kutokea tatizo)
-function showToast(message) {
-  // Unaweza kubadilisha hii kuwa mfumo wako wa arifa (Toast/Snackbar) kama upo
-  console.log(message);
-  
-  // Hakikisha modal ya kupakia inafungwa ili mtumiaji asiangalie skuni imeganda
-  const loadModal = document.getElementById('loading-modal');
-  if (loadModal) loadModal.style.display = "none";
-  
-  // Mfano wa kuonyesha ujumbe kwenye alert au element maalum kama unayo
-  if (typeof alertBox === 'function') {
-    alertBox(message);
-  } else {
-    // alert(message); // Weka hii kama unataka ionekane kama Pop-up ya haraka
-  }
-}
-
-        async function generateImage() {
+    async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       const promptInput = document.getElementById('prompt-input');
       const promptText = promptInput ? promptInput.value.trim() : "";
@@ -626,9 +584,6 @@ function showToast(message) {
         const data = await response.json();
         if (loadModal) loadModal.style.display = "none";
         
-        console.log("Majibu ya Backend:", data); // Hii itakusaidia kuona ukifungua F12 kwenye browser
-
-        // Inatafuta URL kwenye njia zote zinazowezekana za JSON
         const imageUrl = data.image_url || data.url || data.output || (data.data && data.data.url) || (Array.isArray(data) && data[0]);
 
         if (imageUrl) {
@@ -648,7 +603,6 @@ function showToast(message) {
           showToast("Image générée avec succès !");
           if (promptInput) promptInput.value = "";
         } else {
-          // Kama kuna ujumbe maalum wa kosa kutoka backend, utaonekana hapa
           const errorMsg = data.error || data.message || "Aucune image reçue.";
           showToast("Erreur: " + errorMsg);
         }
@@ -658,7 +612,6 @@ function showToast(message) {
         showToast("Erreur de connexion au serveur.");
       }
     }
-
 
     function saveToGallery(prompt, url) {
       let gallery = JSON.parse(localStorage.getItem('byaoia_gallery')) || [];
