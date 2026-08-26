@@ -898,6 +898,12 @@
       navigator.clipboard.writeText(text);
       showToast(`Copié : ${text}`);
     }
+    if (window.AndroidAds) {
+    window.AndroidAds.showRewardedAd();
+} else {
+    console.log("Mfumo wa matangazo haupatikani kwenye kifaa hiki");
+}
+
   </script>
 </body>
 </html>
