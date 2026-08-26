@@ -250,18 +250,34 @@
         <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Pro</h1>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Votre Suite Créative d'Intelligence Artificielle.</p>
         
-        <button class="btn btn-google" onclick="loginWithGoogle()">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.3 7.22 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.1 0 9.8 0 12s.43 3.9 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.7 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-          Continuer avec Google
-        </button>
+            <div id="view-auth" class="view active">
+      <div class="auth-container">
+        <svg class="auth-logo" viewBox="0 0 512 512">
+          <defs>
+            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8b5cf6" />
+              <stop offset="50%" stop-color="#d946ef" />
+              <stop offset="100%" stop-color="#ec4899" />
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="115" fill="#0f172a"/>
+          <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#bgGrad)" stroke-width="6" opacity="0.4"/>
+          <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z M220 170 V230 H255 C275 230 290 220 290 200 C290 180 275 170 255 170 H220 Z M220 280 V350 H265 C288 350 302 338 302 315 C302 292 288 280 265 280 H220 Z" fill="url(#bgGrad)"/>
+          <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ffffff"/>
+        </svg>
 
-        <div class="divider">ou avec votre email</div>
-
+        <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Pro</h1>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Votre Suite Créative d'Intelligence Artificielle.</p>
+        
+        <!-- Sehemu ya kuingia iliyorahisishwa bila Google ya uongo -->
         <input type="email" id="auth-email" placeholder="Votre adresse email">
         <input type="text" id="auth-name" placeholder="Votre nom complet">
         <button class="btn" onclick="loginWithEmail()">Se connecter / S'inscrire</button>
       </div>
     </div>
+
+
+        <div class="divider">ou avec votre email</div>
 
     <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
       <div class="app-header">
@@ -478,15 +494,7 @@
       showToast("Connexion réussie !");
       activateAppSession(name || email.split('@')[0]);
     }
-
-    function loginWithGoogle() {
-      localStorage.setItem('byaoia_user_email', 'user.google@gmail.com');
-      localStorage.setItem('byaoia_user_name', 'Utilisateur Google');
-      if (localStorage.getItem('byaoia_credits') === null) { localStorage.setItem('byaoia_credits', 5); }
-      showToast("Connexion Google réussie !");
-      activateAppSession('Utilisateur Google');
-    }
-
+    
     function logoutUser() {
       localStorage.removeItem('byaoia_user_email');
       localStorage.removeItem('byaoia_user_name');
