@@ -404,11 +404,11 @@
       </div>
 
       <div class="rewarded-ad-box">
-        <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
-        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (AdMob)</button>
+    <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
+    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
+    <!-- Badilisha jina la kitendakazi kiwe kinapiga simu daraja la Start.io (AndroidRewardedAd) -->
+    <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (Start.io)</button>
       </div>
-    </div>
 
     <!-- Screen ya Galerie -->
     <div id="view-gallery" class="view">
@@ -769,45 +769,45 @@ function watchAdForCredits() {
     const loadModal = document.getElementById('loading-modal');
     if (loadModal) loadModal.style.display = "flex";
 
-    // Tunatumia AndroidRewardedAd kama ilivyo kwenye MainActivity.kt yako ya Kotlin
+    // Tunatumia AndroidRewardedAd kama ilivyo kwenye MainActivity.kt
     if (window.AndroidRewardedAd && typeof window.AndroidRewardedAd.showRewardedAd === 'function') {
         window.AndroidRewardedAd.showRewardedAd();
     } else {
-        // Simulation / Njia mbadala kama inajaribiwa kwenye kivinjari cha kawaida (Browser)
+        // Simulation ya dharura endapo inatizamwa kwenye browser ya kawaida ya pc/phone
         setTimeout(() => {
             if (loadModal) loadModal.style.display = "none";
-            grantAdRewardFromNative(); // Inatumia kazi yako ya kuongeza mikopo
+            grantAdRewardFromNative();
         }, 2000);
     }
 }
 
-// Kitendakazi hiki kinaitwa moja kwa moja na Kotlin (MainActivity.kt) pindi tangazo linapokamilika
+// Inaitwa na Kotlin (MainActivity.kt) pindi tangazo linapokamilika kwa mafanikio
 function grantAdRewardFromNative() {
     const loadModal = document.getElementById('loading-modal');
     if (loadModal) loadModal.style.display = "none";
 
-    // Ongeza mikopo 2
+    // Ongeza mikopo 2 kwenye localStorage
     let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
     localStorage.setItem('byaoia_credits', credits);
     
     const creditEl = document.getElementById('user-credits');
     if (creditEl) creditEl.innerText = credits;
 
-    // Onyesha pop-up ya kisasa badala ya alert ya kuchosha
-    showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+    // Onyesha ujumbe wa mafanikio wa kisasa
+    if (typeof showToast === 'function') {
+        showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+    }
 }
 
-// Kitendakazi cha ziada ikiwa tangazo limeshindwa kupatikana litoke kwenye loading
+// Inaitwa na Kotlin endapo tangazo limeshindwa kupatikana
 function onAdFailed() {
     const loadModal = document.getElementById('loading-modal');
     if (loadModal) loadModal.style.display = "none";
     
-    // Tunatumia showToast badala ya alert
-    showToast("⚠️ Publicité indisponible pour le moment. Réessayez plus tard.");
+    if (typeof showToast === 'function') {
+        showToast("⚠️ Publicité indisponible pour le moment. Réessayez plus tard.");
+    }
 }
-
-
-
     async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       const promptInput = document.getElementById('prompt-input');
