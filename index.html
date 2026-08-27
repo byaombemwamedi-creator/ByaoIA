@@ -6,7 +6,6 @@
   <title>ByaoIA - Studio Créatif Pro</title>
   <meta name="theme-color" content="#0f172a">
 
-
   <style>
      :root {
       --primary: #8b5cf6;
@@ -105,11 +104,6 @@
     }
     .credit-badge:hover { transform: scale(1.05); box-shadow: 0 0 12px rgba(139,92,246,0.4); }
 
-    /* Network Status Indicator */
-    #connection-status { padding: 9px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; margin-bottom: 14px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .status-online { background: #064e3b22; color: var(--success); border: 1px solid var(--success); }
-    .status-offline { background: #7f1d1d22; color: #ef4444; border: 1px solid #ef4444; }
-
     /* Form Inputs */
     textarea, input { width: 100%; background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; color: #fff; font-size: 0.95rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
     textarea { resize: none; height: 120px; }
@@ -166,109 +160,24 @@
     .gallery-card img { width: 100%; height: 140px; object-fit: cover; }
     .gallery-card-info { padding: 10px; font-size: 0.8rem; }
 
-    /* AI Chat Specific Styles (Full Screen View) */
-    #view-chat {
-        display: none;
-        flex-direction: column;
-        height: 100%;
-        padding-bottom: 85px;
-    }
-    #view-chat.active {
-        display: flex;
-    }
-    #chat-container {
-        flex: 1;
-        overflow-y: auto;
-        padding: 10px 0;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        scroll-behavior: smooth;
-    }
-    .chat-message {
-        max-width: 90%;
-        font-size: 15px;
-        line-height: 1.6;
-        word-wrap: break-word;
-    }
-    .user-msg {
-        background: #7c3aed;
-        color: white;
-        align-self: flex-end;
-        padding: 10px 16px;
-        border-radius: 16px;
-        border-bottom-right-radius: 2px;
-    }
-    .ai-msg {
-        background: #1e293b;
-        color: #f3f4f6;
-        align-self: flex-start;
-        padding: 12px 16px;
-        border-radius: 16px;
-        border-bottom-left-radius: 2px;
-        width: 100%;
-        border: 1px solid #334155;
-    }
-    .error-msg {
-        background: #451a1a;
-        color: #ff4d4d;
-        padding: 10px;
-        border-radius: 8px;
-        align-self: center;
-        border: 1px solid #ff4d4d;
-    }
-    .ai-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 10px;
-        font-size: 12px;
-    }
-    .ai-actions button {
-        background: #0f172a;
-        color: #aaa;
-        border: 1px solid #334155;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .ai-actions button:hover {
-        background: #1e293b;
-        color: #fff;
-        border-color: var(--primary);
-    }
-    .chat-input-box {
-        padding: 10px 0;
-        background: #000;
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-    .chat-input-box input[type="text"] {
-        flex: 1;
-        padding: 12px 18px;
-        border-radius: 25px;
-        border: 1px solid #334155;
-        background: #1e293b;
-        color: white;
-        font-size: 14px;
-        outline: none;
-        margin-bottom: 0;
-    }
+    /* AI Chat Specific Styles */
+    #view-chat { display: none; flex-direction: column; height: 100%; padding-bottom: 85px; }
+    #view-chat.active { display: flex; }
+    #chat-container { flex: 1; overflow-y: auto; padding: 10px 0; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+    .chat-message { max-width: 90%; font-size: 15px; line-height: 1.6; word-wrap: break-word; }
+    .user-msg { background: #7c3aed; color: white; align-self: flex-end; padding: 10px 16px; border-radius: 16px; border-bottom-right-radius: 2px; }
+    .ai-msg { background: #1e293b; color: #f3f4f6; align-self: flex-start; padding: 12px 16px; border-radius: 16px; border-bottom-left-radius: 2px; width: 100%; border: 1px solid #334155; }
+    .error-msg { background: #451a1a; color: #ff4d4d; padding: 10px; border-radius: 8px; align-self: center; border: 1px solid #ff4d4d; }
+    .ai-actions { display: flex; gap: 12px; margin-top: 10px; font-size: 12px; }
+    .ai-actions button { background: #0f172a; color: #aaa; border: 1px solid #334155; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    .ai-actions button:hover { background: #1e293b; color: #fff; border-color: var(--primary); }
+    
+    .chat-input-box { padding: 10px 0; background: #000; display: flex; gap: 10px; align-items: center; }
+    .chat-input-box input[type="text"] { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 14px; outline: none; margin-bottom: 0; }
     .chat-input-box input[type="text"]:focus { border-color: var(--primary); }
-    .chat-send-btn {
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #7c3aed, #a855f7);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-weight: bold;
-        cursor: pointer;
-        height: 48px;
-    }
-    .typing span {
-        height: 6px; width: 6px; float: left; margin: 0 2px; background-color: var(--primary); border-radius: 50%; display: inline-block; animation: bounce 1.3s linear infinite;
-    }
+    .chat-send-btn { padding: 12px 20px; background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; height: 48px; }
+    
+    .typing span { height: 6px; width: 6px; float: left; margin: 0 2px; background-color: var(--primary); border-radius: 50%; display: inline-block; animation: bounce 1.3s linear infinite; }
     .typing span:nth-child(2) { animation-delay: -1.1s; }
     .typing span:nth-child(3) { animation-delay: -0.9s; }
     @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
@@ -292,12 +201,6 @@
 
     .spinner { width: 40px; height: 40px; border: 4px solid #334155; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .ad-banner-box { background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px dashed var(--primary); border-radius: 10px; padding: 10px; text-align: center; margin-bottom: 14px; font-size: 0.75rem; color: var(--text-muted); }
-    @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
@@ -337,7 +240,7 @@
       </div>
     </div>
 
-    <!-- Header ya Juu -->
+    <!-- Header ya Juu (Bila sehemu za ziada) -->
     <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
       <div class="app-header">
         <div class="logo-container">
@@ -353,7 +256,8 @@
         </div>
       </div>
     </div>
-        <!-- Screen ya AI Chatbot (Sasa ni ukurasa wake kamili unaofunguka kupitia Menu ya chini) -->
+
+    <!-- Screen ya AI Chatbot -->
     <div id="view-chat" class="view">
       <div style="font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-bottom: 12px;">ByaoIA AI Assistant</div>
       
@@ -362,7 +266,7 @@
           <div id="welcome-msg-txt">Bonjour! Moi c'est ByaoIA. comment puis-je t'aider?</div>
           <div class="ai-actions">
             <button onclick="copyChatText('welcome-msg-txt')">📋 Copier</button>
-            <button onclick="retryMessage('Bonjour! Moi c'est ByaoIA. comment puis-je t'aider?')">🔄 Réessayer</button>
+            <button onclick="retryMessage('Bonjour! Moi c\'est ByaoIA. comment puis-je t\'aider?')">🔄 Réessayer</button>
           </div>
         </div>
       </div>
@@ -373,11 +277,8 @@
       </div>
     </div>
 
-
     <!-- Screen ya Kutengeneza Picha (Generate View) -->
     <div id="view-generate" class="view">
-      <div id="connection-status" class="status-online">Inachunguza mtandao...</div>
-
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
       <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
 
@@ -404,17 +305,12 @@
       </div>
 
       <div class="rewarded-ad-box">
-    <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
-    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
-    <!-- Badilisha jina la kitendakazi kiwe kinapiga simu daraja la Start.io (AndroidRewardedAd) -->
-    <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (Start.io)</button>
+        <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
+        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (Start.io)</button>
       </div>
-<!-- Modali ya kusubiri yenye Spinner inayozunguka -->
-<div id="loading-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; justify-content:center; align-items:center; flex-direction:column;">
-    <!-- Spinner ya kuzunguka -->
-    <div style="width: 40px; height: 40px; border: 4px solid #c084fc; border-top: 4px solid transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    <p id="loader-subtitle" style="color: white; margin-top: 15px; font-size: 0.9rem;">Chargement de la publicité...</p>
-</div>
+    </div>
+
     <!-- Screen ya Galerie -->
     <div id="view-gallery" class="view">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -491,11 +387,11 @@
       <div class="nav-item" onclick="switchView('view-contact')"><span class="nav-icon">🌐</span>Contacts</div>
     </div>
 
-    <!-- Modal ya Loading / Subira Kidogo -->
-    <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%;background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100;">
+    <!-- Modali ya Loading / Subira Kidogo -->
+    <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100; flex-direction:column;">
       <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
         <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Création en cours...</h3>
+        <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Chargement...</h3>
         <p style="font-size: 0.75rem; color: var(--text-muted);" id="loader-subtitle">L'IA façonne votre image...</p>
       </div>
     </div>
@@ -513,7 +409,6 @@
     window.onload = async function() { 
       try {
         checkUserSession(); 
-        updateNetworkStatus();
       } catch (err) {
         console.error("Session check error:", err);
       } finally {
@@ -525,29 +420,6 @@
       }
     };
 
-    window.addEventListener('online', () => {
-      updateNetworkStatus();
-      showToast("Mtandao umerudi!");
-    });
-
-    window.addEventListener('offline', () => {
-      updateNetworkStatus();
-      showToast("Huna mtandao kwa sasa.");
-    });
-
-    function updateNetworkStatus() {
-      const statusEl = document.getElementById('connection-status');
-      if (statusEl) {
-        if (navigator.onLine) {
-          statusEl.className = "status-online";
-          statusEl.innerHTML = "🟢 Connecté au réseau";
-        } else {
-          statusEl.className = "status-offline";
-          statusEl.innerHTML = "🔴 Pas de connexion réseau";
-        }
-      }
-    }
-
     function showToast(message) {
       const toast = document.getElementById('toast-notification');
       if (toast) {
@@ -556,7 +428,6 @@
         setTimeout(() => { toast.classList.remove('show'); }, 3000);
       }
       
-      // Hakikisha modal ya kupakia inafungwa kama kulikuwa na tatizo
       const loadModal = document.getElementById('loading-modal');
       if (loadModal) loadModal.style.display = "none";
     }
@@ -625,25 +496,23 @@
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       const targetView = document.getElementById(viewId);
       if (targetView) targetView.classList.add('active');
-      const navMap = { 'view-generate': 0, 'view-gallery': 1, 'view-recharge': 2, 'view-contact': 3 };
+      const navMap = { 'view-generate': 0, 'view-chat': 1, 'view-gallery': 2, 'view-recharge': 3, 'view-contact': 4 };
       if (navMap[viewId] !== undefined) { 
         const navItems = document.querySelectorAll('.nav-item');
         if (navItems[navMap[viewId]]) navItems[navMap[viewId]].classList.add('active'); 
       }
       if (viewId === 'view-gallery') renderGallery();
     }
-       // --- AI CHATBOT LOGIC ---
-    
-     async function sendChatMessage(promptText = null) {
+
+    // --- AI CHATBOT LOGIC ---
+    async function sendChatMessage(promptText = null) {
         const inputField = document.getElementById("user-chat-input");
         const chatContainer = document.getElementById("chat-container");
         const prompt = promptText || inputField.value.trim();
         
         if (!prompt) return;
-
         lastUserPrompt = prompt;
         
-        // 1. Tumeongeza kitufe cha "Modifier" kwenye ujumbe wa mteja
         const escapedPrompt = escapeHtml(prompt);
         chatContainer.innerHTML += `
             <div class="chat-message user-msg">
@@ -653,9 +522,7 @@
                 </div>
             </div>`;
             
-        if (!promptText) {
-            inputField.value = "";
-        }
+        if (!promptText) { inputField.value = ""; }
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
         const typingId = "typing-" + Date.now();
@@ -663,31 +530,23 @@
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apikey}`;
             const response = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
+                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
             });
 
             const data = await response.json();
-            
             const typingElement = document.getElementById(typingId);
             if (typingElement) typingElement.remove();
 
-            if (data.error) {
-                throw new Error(data.error.message || "Kosa kutoka Google API");
-            }
+            if (data.error) { throw new Error(data.error.message || "Kosa kutoka Google API"); }
 
             const aiReply = data.candidates[0].content.parts[0].text;
-
             const msgId = "msg-" + Date.now();
             const containerId = "container-" + Date.now();
             
-            // 2. Kwenye jibu la AI tumeweka vitufe vya "Copier" na "Réessayer" kwa Kifaransa
             chatContainer.innerHTML += `
                 <div id="${containerId}" class="chat-message ai-msg">
                     <div id="${msgId}"></div>
@@ -706,113 +565,90 @@
                 if (i < aiReply.length) {
                     rawText += aiReply.charAt(i);
                     i++;
-                    
-                    let formattedReply = escapeHtml(rawText)
-                        .replace(/\n/g, '<br>')
-                        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                    
+                    let formattedReply = escapeHtml(rawText).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                     const targetElem = document.getElementById(msgId);
                     if(targetElem) {
                         targetElem.innerHTML = formattedReply;
                         chatContainer.scrollTop = chatContainer.scrollHeight;
                     }
-                    
                     setTimeout(typeWriter, speed);
                 }
             }
-
             typeWriter();
-
         } catch (error) {
             const typingElement = document.getElementById(typingId);
             if (typingElement) typingElement.remove();
-            
             chatContainer.innerHTML += `<div class="chat-message error-msg">Kosa: ${error.message}</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
     }
 
-    // 3. Ongeza hii function ya kusimamia kitufe cha Modifier
     function editUserMessage(text) {
         const inputField = document.getElementById("user-chat-input");
-        if (inputField) {
-            inputField.value = text;
-            inputField.focus();
-        }
+        if (inputField) { inputField.value = text; inputField.focus(); }
     }
 
     function retryChatMessage() {
-        if (lastUserPrompt) {
-            sendChatMessage(lastUserPrompt);
-        }
+        if (lastUserPrompt) { sendChatMessage(lastUserPrompt); }
     }
 
     function copyChatText(elementId) {
         const textToCopy = document.getElementById(elementId).innerText;
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            showToast("Imenakiliwa kikamilifu!");
-        });
+        navigator.clipboard.writeText(textToCopy).then(() => { showToast("Imenakiliwa kikamilifu!"); });
     }
 
     function handleChatKeyPress(event) {
-        if (event.key === 'Enter') {
-            sendChatMessage();
-        }
+        if (event.key === 'Enter') { sendChatMessage(); }
     }
 
     function escapeHtml(text) {
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    document.getElementById("send-chat-btn").addEventListener("click", () => sendChatMessage());
-
-    // Kitendakazi kikuu kinachoitwa na kitufe cha kupata credits
-function watchAdForCredits() {
-    const loaderSub = document.getElementById('loader-subtitle');
-    if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
-    
-    const loadModal = document.getElementById('loading-modal');
-    if (loadModal) loadModal.style.display = "flex";
-
-    // Tunatumia AndroidRewardedAd kama ilivyo kwenye MainActivity.kt
-    if (window.AndroidRewardedAd && typeof window.AndroidRewardedAd.showRewardedAd === 'function') {
-        window.AndroidRewardedAd.showRewardedAd();
-    } else {
-        // Simulation ya dharura endapo inatizamwa kwenye browser ya kawaida ya pc/phone
-        setTimeout(() => {
-            if (loadModal) loadModal.style.display = "none";
-            grantAdRewardFromNative();
-        }, 2000);
+    const sendChatBtn = document.getElementById("send-chat-btn");
+    if (sendChatBtn) {
+        sendChatBtn.addEventListener("click", () => sendChatMessage());
     }
-}
 
-// Inaitwa na Kotlin (MainActivity.kt) pindi tangazo linapokamilika kwa mafanikio
-function grantAdRewardFromNative() {
-    const loadModal = document.getElementById('loading-modal');
-    if (loadModal) loadModal.style.display = "none";
+    // --- REWARDED ADS LOGIC (Start.io) ---
+    function watchAdForCredits() {
+        const loaderSub = document.getElementById('loader-subtitle');
+        if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
+        
+        const loadModal = document.getElementById('loading-modal');
+        if (loadModal) loadModal.style.display = "flex";
 
-    // Ongeza mikopo 2 kwenye localStorage
-    let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
-    localStorage.setItem('byaoia_credits', credits);
-    
-    const creditEl = document.getElementById('user-credits');
-    if (creditEl) creditEl.innerText = credits;
+        if (window.AndroidRewardedAd && typeof window.AndroidRewardedAd.showRewardedAd === 'function') {
+            window.AndroidRewardedAd.showRewardedAd();
+        } else {
+            // Simulation kwa ajili ya vivinjari vya kawaida (Browser)
+            setTimeout(() => {
+                if (loadModal) loadModal.style.display = "none";
+                grantAdRewardFromNative();
+            }, 2000);
+        }
+    }
 
-    // Onyesha ujumbe wa mafanikio wa kisasa
-    if (typeof showToast === 'function') {
+    function grantAdRewardFromNative() {
+        const loadModal = document.getElementById('loading-modal');
+        if (loadModal) loadModal.style.display = "none";
+
+        let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+        localStorage.setItem('byaoia_credits', credits);
+        
+        const creditEl = document.getElementById('user-credits');
+        if (creditEl) creditEl.innerText = credits;
+
         showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
     }
-}
 
-// Inaitwa na Kotlin endapo tangazo limeshindwa kupatikana
-function onAdFailed() {
-    const loadModal = document.getElementById('loading-modal');
-    if (loadModal) loadModal.style.display = "none";
-    
-    if (typeof showToast === 'function') {
+    function onAdFailed() {
+        const loadModal = document.getElementById('loading-modal');
+        if (loadModal) loadModal.style.display = "none";
         showToast("⚠️ Publicité indisponible pour le moment. Réessayez plus tard.");
     }
-}
+
+    // --- IMAGE GENERATION LOGIC ---
     async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       const promptInput = document.getElementById('prompt-input');
@@ -914,12 +750,6 @@ function onAdFailed() {
       navigator.clipboard.writeText(text);
       showToast(`Copié : ${text}`);
     }
-    if (window.AndroidAds) {
-    window.AndroidAds.showRewardedAd();
-} else {
-    console.log("Mfumo wa matangazo haupatikani kwenye kifaa hiki");
-}
-
   </script>
 </body>
 </html>
