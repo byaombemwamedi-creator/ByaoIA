@@ -761,41 +761,52 @@
 
     document.getElementById("send-chat-btn").addEventListener("click", () => sendChatMessage());
 
-    function watchAdForCredits() {
-      const loaderSub = document.getElementById('loader-subtitle');
-      if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
-      const loadModal = document.getElementById('loading-modal');
-      if (loadModal) loadModal.style.display = "flex";
+    // Kitendakazi kikuu kinachoitwa na kitufe cha kupata credits
+function watchAdForCredits() {
+    const loaderSub = document.getElementById('loader-subtitle');
+    if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
+    
+    const loadModal = document.getElementById('loading-modal');
+    if (loadModal) loadModal.style.display = "flex";
 
-      // Tunakagua kama upo ndani ya AndroidIDE (Native WebView ya Android)
-      if (window.AndroidBridge && typeof window.AndroidBridge.showRewardedAd === 'function') {
-        window.AndroidBridge.showRewardedAd();
-      } else {
-        // Simulation kwa ajili ya browser ya kawaida
+    // Tunatumia AndroidRewardedAd kama ilivyo kwenye MainActivity.kt yako ya Kotlin
+    if (window.AndroidRewardedAd && typeof window.AndroidRewardedAd.showRewardedAd === 'function') {
+        window.AndroidRewardedAd.showRewardedAd();
+    } else {
+        // Simulation / Njia mbadala kama inajaribiwa kwenye kivinjari cha kawaida (Browser)
         setTimeout(() => {
-          if (loadModal) loadModal.style.display = "none";
-          let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
-          localStorage.setItem('byaoia_credits', credits);
-          const creditEl = document.getElementById('user-credits');
-          if (creditEl) creditEl.innerText = credits;
-          showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+            if (loadModal) loadModal.style.display = "none";
+            grantAdRewardFromNative(); // Inatumia kazi yako ya kuongeza mikopo
         }, 2000);
-      }
     }
+}
 
-    // Kitendakazi kinachoitwa kutoka kwenye MainActivity.kt ya Android
-    function grantAdRewardFromNative() {
-      const loadModal = document.getElementById('loading-modal');
-      if (loadModal) loadModal.style.display = "none";
+// Kitendakazi hiki kinaitwa moja kwa moja na Kotlin (MainActivity.kt) pindi tangazo linapokamilika
+function grantAdRewardFromNative() {
+    const loadModal = document.getElementById('loading-modal');
+    if (loadModal) loadModal.style.display = "none";
 
-      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
-      localStorage.setItem('byaoia_credits', credits);
-      
-      const creditEl = document.getElementById('user-credits');
-      if (creditEl) creditEl.innerText = credits;
+    // Ongeza mikopo 2
+    let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+    localStorage.setItem('byaoia_credits', credits);
+    
+    const creditEl = document.getElementById('user-credits');
+    if (creditEl) creditEl.innerText = credits;
 
-      showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
-    }
+    // Onyesha pop-up ya kisasa badala ya alert ya kuchosha
+    showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+}
+
+// Kitendakazi cha ziada ikiwa tangazo limeshindwa kupatikana litoke kwenye loading
+function onAdFailed() {
+    const loadModal = document.getElementById('loading-modal');
+    if (loadModal) loadModal.style.display = "none";
+    
+    // Tunatumia showToast badala ya alert
+    showToast("⚠️ Publicité indisponible pour le moment. Réessayez plus tard.");
+}
+
+
 
     async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
