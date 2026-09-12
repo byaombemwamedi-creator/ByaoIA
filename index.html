@@ -402,12 +402,13 @@
   </div>
 
   <script>
-    const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
+        const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
     const apikey = "WEKA_API_KEY_YAKO_HAPA";
 
     let selectedStyle = "Photoréaliste";
     let currentGeneratedImageUrl = "";
     let lastUserPrompt = "";
+    let currentAbortController = null;
     
     window.onload = async function() { 
       try {
@@ -508,440 +509,220 @@
     }
 
     // --- AI CHATBOT LOGIC ---
-    async function sendChatMessage(promptText = null) {
-        const inputField = document.getElementById("user-chat-input");
-        const chatContainer = document.getElementById("chat-container");
-        const prompt = promptText || inputField.value.trim();
-        
-        if (!prompt) return;
-        lastUserPrompt = prompt;
-        
+    async function sendChatMessage(promptText = null, isRetry = false) {
+      const inputField = document.getElementById("user-chat-input");
+      const chatContainer = document.getElementById("chat-container");
+
+      if (!navigator.onLine) {
+        showToast("Pas de connexion Internet.");
+        return;
+      }
+
+      const prompt = promptText || inputField.value.trim();
+      if (!prompt) return;
+
+      lastUserPrompt = prompt;
+      const msgTimestamp = Date.now();
+
+      if (!isRetry) {
         const escapedPrompt = escapeHtml(prompt);
+        const userMsgId = "user-msg-" + msgTimestamp;
         chatContainer.innerHTML += `
-            <div class="chat-message user-msg">
-                ${escapedPrompt}
-                <div style="margin-top: 6px; font-size: 11px; text-align: right;">
-                    <button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️ Modifier</button>
-                </div>
-            </div>`;
-            
-        if (!promptText) { inputField.value = ""; }
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+          <div id="${userMsgId}" class="chat-message user-msg">
+            ${escapedPrompt}
+            <div style="margin-top: 6px; font-size: 11px; text-align: right; display: flex; gap: 5px; justify-content: flex-end;">
+              <button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️</button>
+              <button onclick="deleteMessage('${userMsgId}')" style="background: rgba(255,0,0,0.3); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">🗑️</button>
+            </div>
+          </div>`;
+      }
 
-        const typingId = "typing-" + Date.now();
-        chatContainer.innerHTML += `<div id="${typingId}" class="chat-message ai-msg typing"><span></span><span></span><span></span></div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+      if (!promptText) { inputField.value = ""; }
+      chatContainer.scrollTop = chatContainer.scrollHeight;
 
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apikey}`;
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
+      const typingId = "typing-" + msgTimestamp;
+      chatContainer.innerHTML += `
+        <div id="${typingId}" class="chat-message ai-msg typing" style="display:flex; align-items:center; justify-content:space-between;">
+          <div><span></span><span></span><span></span></div>
+          <button onclick="stopGeneration()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 10px;">⏹️ Arrêter</button>
+        </div>`;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            const data = await response.json();
-            const typingElement = document.getElementById(typingId);
-            if (typingElement) typingElement.remove();
+      toggleInputState(true);
+      currentAbortController = new AbortController();
 
-            if (data.error) { throw new Error(data.error.message || "Kosa kutoka Google API"); }
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apikey}`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: currentAbortController.signal,
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
 
-            const aiReply = data.candidates[0].content.parts[0].text;
-            const msgId = "msg-" + Date.now();
-            const containerId = "container-" + Date.now();
-            
-            chatContainer.innerHTML += `
-                <div id="${containerId}" class="chat-message ai-msg">
-                    <div id="${msgId}"></div>
-                    <div class="ai-actions">
-                        <button onclick="copyChatText('${msgId}')">📋 Copier</button>
-                        <button onclick="retryChatMessage()">🔄 Réessayer</button>
-                    </div>
-                </div>`;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        const data = await response.json();
+        removeElement(typingId);
 
-            let i = 0;
-            const speed = 3; 
-            let rawText = "";
-
-            function typeWriter() {
-                if (i < aiReply.length) {
-                    rawText += aiReply.charAt(i);
-                    i++;
-                    let formattedReply = escapeHtml(rawText).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-                    const targetElem = document.getElementById(msgId);
-                    if(targetElem) {
-                        targetElem.innerHTML = formattedReply;
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                    }
-                    setTimeout(typeWriter, speed);
-                }
-            }
-            typeWriter();
-        } catch (error) {
-            const typingElement = document.getElementById(typingId);
-            if (typingElement) typingElement.remove();
-            chatContainer.innerHTML += `<div class="chat-message error-msg">Kosa: ${error.message}</div>`;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (data.error) {
+          throw new Error(data.error.message || "Erreur provenant de l'API Google.");
         }
+
+        const aiReply = data.candidates[0].content.parts[0].text;
+        const msgId = "msg-" + msgTimestamp;
+        const containerId = "container-" + msgTimestamp;
+
+        chatContainer.innerHTML += `
+          <div id="${containerId}" class="chat-message ai-msg">
+            <div id="${msgId}"></div>
+            <div class="ai-actions" style="margin-top: 8px; display: flex; gap: 8px;">
+              <button onclick="copyChatText('${msgId}')">📋 Copier</button>
+              <button onclick="retryChatMessage()">🔄 Réessayer</button>
+              <button onclick="deleteMessage('${containerId}')">🗑️ Supprimer</button>
+            </div>
+          </div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        let i = 0;
+        const speed = 3;
+        let rawText = "";
+
+        function typeWriter() {
+          if (i < aiReply.length) {
+            rawText += aiReply.charAt(i);
+            i++;
+            const targetElem = document.getElementById(msgId);
+            if (targetElem) {
+              targetElem.innerHTML = parseMarkdown(rawText);
+              chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            setTimeout(typeWriter, speed);
+          } else {
+            toggleInputState(false);
+          }
+        }
+        typeWriter();
+
+      } catch (error) {
+        removeElement(typingId);
+        toggleInputState(false);
+
+        if (error.name === 'AbortError') {
+          showToast("Génération interrompue.");
+          return;
+        }
+
+        const errorId = "err-" + Date.now();
+        chatContainer.innerHTML += `
+          <div id="${errorId}" class="chat-message error-msg" style="background: rgba(231, 76, 60, 0.1); border-left: 3px solid #e74c3c; padding: 8px; margin: 5px 0;">
+            ⚠️ Erreur : ${error.message || "Impossible de contacter le serveur."}
+          </div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      } finally {
+        currentAbortController = null;
+      }
+    }
+
+    function retryChatMessage() {
+      if (lastUserPrompt) {
+        sendChatMessage(lastUserPrompt, true);
+      }
+    }
+
+    function stopGeneration() {
+      if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
+      }
+    }
+
+    function deleteMessage(elementId) {
+      removeElement(elementId);
+    }
+
+    function removeElement(id) {
+      const elem = document.getElementById(id);
+      if (elem) elem.remove();
     }
 
     function editUserMessage(text) {
-        const inputField = document.getElementById("user-chat-input");
-        if (inputField) { inputField.value = text; inputField.focus(); }
-    }
- 
-// --- AI CHATBOT LOGIC ---
-
-let currentAbortController = null; // Permet d'arrêter la demande en cours
-
-async function sendChatMessage(promptText = null, isRetry = false) {
-const inputField = document.getElementById("user-chat-input");
-const chatContainer = document.getElementById("chat-container");
-const sendBtn = document.getElementById("send-chat-btn");
-
-// 1. Vérification réseau (Amélioration Bonus 1)
-if (!navigator.onLine) {
-showErrorMessage("Pas de connexion Internet. Veuillez vérifier votre réseau.");
-return;
-}
-
-const prompt = promptText || inputField.value.trim();
-if (!prompt) return;
-
-lastUserPrompt = prompt;
-const msgTimestamp = Date.now();
-
-// 2. N'affiche le message utilisateur QUE si ce n'est PAS un essai (évite la répétition)
-if (!isRetry) {
-const escapedPrompt = escapeHtml(prompt);
-const userMsgId = "user-msg-" + msgTimestamp;
-chatContainer.innerHTML += `
-<div id="${userMsgId}" class="chat-message user-msg">
-${escapedPrompt}
-<div style="margin-top: 6px; font-size: 11px; text-align: right; display: flex; gap: 5px; justify-content: flex-end;">
-<button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️ </button>
-<button onclick="deleteMessage('${userMsgId}')" style="background: rgba(255,0,0,0.3); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">🗑️</button>
-</div>
-</div>`;
-}
-
-if (!promptText) { inputField.value = ""; }
-chatContainer.scrollTop = chatContainer.scrollHeight;
-
-// 3. Indicateur de chargement avec bouton "Arrêter"
-const typingId = "typing-" + msgTimestamp;
-chatContainer.innerHTML += `
-<div id="${typingId}" class="chat-message ai-msg typing" style="display:flex; align-items:center; justify-content:space-between;">
-<div><span></span><span></span><span></span></div>
-<button onclick="stopGeneration()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 10px;">⏹️ Arrêter</button>
-</div>`;
-chatContainer.scrollTop = chatContainer.scrollHeight;
-
-// Blocage des entrées pendant le traitement (Amélioration Bonus 2)
-toggleInputState(true);
-
-// Initialisation de l'annulation (AbortController)
-currentAbortController = new AbortController();
-
-try {
-// Utilisation du modèle stable (gemini-1.5-flash recommandé)
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apikey}`;
-
-const response = await fetch(url, {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-signal: currentAbortController.signal,
-body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-});
-
-const data = await response.json();
-removeElement(typingId);
-
-if (data.error) {
-throw new Error(data.error.message || "Erreur provenant de l'API Google.");
-}
-
-const aiReply = data.candidates[0].content.parts[0].text;
-const msgId = "msg-" + msgTimestamp;
-const containerId = "container-" + msgTimestamp;
-
-chatContainer.innerHTML += `
-<div id="${containerId}" class="chat-message ai-msg">
-<div id="${msgId}"></div>
-<div class="ai-actions" style="margin-top: 8px; display: flex; gap: 8px;">
-<button onclick="copyChatText('${msgId}')">📋 Copier</button>
-<button onclick="retryChatMessage()">🔄 Réessayer</button>
-<button onclick="deleteMessage('${containerId}')">🗑️ Supprimer</button>
-</div>
-</div>`;
-chatContainer.scrollTop = chatContainer.scrollHeight;
-
-// Effet écriture progressive
-let i = 0;
-const speed = 3;
-let rawText = "";
-// --- AI CHATBOT LOGIC SÉCURISÉ ---
-
-let currentAbortController = null;
-
-async function sendChatMessage(promptText = null, isRetry = false) {
-  const inputField = document.getElementById("user-chat-input");
-  const chatContainer = document.getElementById("chat-container");
-  const sendBtn = document.getElementById("send-chat-btn");
-
-  if (!navigator.onLine) {
-    showErrorMessage("Pas de connexion Internet. Veuillez vérifier votre réseau.");
-    return;
-  }
-
-  const prompt = promptText || inputField.value.trim();
-  if (!prompt) return;
-
-  lastUserPrompt = prompt;
-  const msgTimestamp = Date.now();
-
-  if (!isRetry) {
-    const escapedPrompt = escapeHtml(prompt);
-    const userMsgId = "user-msg-" + msgTimestamp;
-    chatContainer.innerHTML += `
-      <div id="${userMsgId}" class="chat-message user-msg">
-        ${escapedPrompt}
-        <div style="margin-top: 6px; font-size: 11px; text-align: right; display: flex; gap: 5px; justify-content: flex-end;">
-          <button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️ </button>
-          <button onclick="deleteMessage('${userMsgId}')" style="background: rgba(255,0,0,0.3); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">🗑️</button>
-        </div>
-      </div>`;
-  }
-
-  if (!promptText) { inputField.value = ""; }
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-
-  const typingId = "typing-" + msgTimestamp;
-  chatContainer.innerHTML += `
-    <div id="${typingId}" class="chat-message ai-msg typing" style="display:flex; align-items:center; justify-content:space-between;">
-      <div><span></span><span></span><span></span></div>
-      <button onclick="stopGeneration()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 10px;">⏹️ Arrêter</button>
-    </div>`;
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-
-  toggleInputState(true);
-  currentAbortController = new AbortController();
-
-  try {
-    // 🛡️ REMPLACEMENT : On appelle votre propre backend ou proxy sécurisé au lieu de Google directement
-    const backendUrl = "https://votre-backend.com/api/gemini-chat"; // Remplacez par votre endpoint sécurisé
-
-    const response = await fetch(backendUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: currentAbortController.signal,
-      body: JSON.stringify({ prompt: prompt }) // Votre serveur s'occupera d'ajouter la clé Gemini cachée
-    });
-
-    const data = await response.json();
-    removeElement(typingId);
-
-    if (!response.ok || data.error) {
-      throw new Error(data.error || "Erreur provenant du serveur sécurisé.");
-    }
-
-    const aiReply = data.reply; // Votre backend doit renvoyer la réponse propre dans { reply: "..." }
-    const msgId = "msg-" + msgTimestamp;
-    const containerId = "container-" + msgTimestamp;
-
-    chatContainer.innerHTML += `
-      <div id="${containerId}" class="chat-message ai-msg">
-        <div id="${msgId}"></div>
-        <div class="ai-actions" style="margin-top: 8px; display: flex; gap: 8px;">
-          <button onclick="copyChatText('${msgId}')">📋 Copier</button>
-          <button onclick="retryChatMessage()">🔄 Réessayer</button>
-          <button onclick="deleteMessage('${containerId}')">🗑️ Supprimer</button>
-        </div>
-      </div>`;
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    let i = 0;
-    const speed = 3;
-    let rawText = "";
-
-    function typeWriter() {
-      if (i < aiReply.length) {
-        rawText += aiReply.charAt(i);
-        i++;
-        const targetElem = document.getElementById(msgId);
-        if (targetElem) {
-          targetElem.innerHTML = parseMarkdown(rawText);
-          chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-        setTimeout(typeWriter, speed);
-      } else {
-        toggleInputState(false);
+      const inputField = document.getElementById("user-chat-input");
+      if (inputField) {
+        inputField.value = text;
+        inputField.focus();
       }
     }
-    typeWriter();
 
-  } catch (error) {
-    removeElement(typingId);
-    toggleInputState(false);
-
-    if (error.name === 'AbortError') {
-      showToast("Génération interrompue par l'utilisateur.");
-      return;
+    function copyChatText(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      navigator.clipboard.writeText(element.innerText).then(() => {
+        showToast("Texte copié !");
+      });
     }
 
-    const errorId = "err-" + Date.now();
-    chatContainer.innerHTML += `
-      <div id="${errorId}" class="chat-message error-msg" style="background: rgba(231, 76, 60, 0.1); border-left: 3px solid #e74c3c; padding: 8px; margin: 5px 0;">
-        ⚠️ <b>Erreur :</b> ${error.message || "Impossible de contacter le serveur."}
-        <div style="margin-top: 6px; display: flex; gap: 8px;">
-          <button onclick="retryChatMessage()" style="background: #3498db; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">🔄 Réessayer</button>
-          <button onclick="deleteMessage('${errorId}')" style="background: rgba(0,0,0,0.2); color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px;">🗑️ Supprimer</button>
-        </div>
-      </div>`;
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  } finally {
-    currentAbortController = null;
-  }
-}
+    function handleChatKeyPress(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    }
 
-// (Conservez toutes vos autres fonctions utilitaires : retryChatMessage, stopGeneration, deleteMessage, parseMarkdown, etc. à la suite)
+    function parseMarkdown(text) {
+      let html = escapeHtml(text);
+      html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
+      html = html.replace(/\n/g, '<br>');
+      return html;
+    }
 
-// --- FONCTIONS SECONDAIRES & UTILITIES ---
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
 
-// 1. Fonction pour réessayer la dernière question sans la dupliquer
-function retryChatMessage() {
-if (lastUserPrompt) {
-sendChatMessage(lastUserPrompt, true); // true = mode retry
-}
-}
+    function toggleInputState(disabled) {
+      const inputField = document.getElementById("user-chat-input");
+      const sendBtn = document.getElementById("send-chat-btn");
+      if (inputField) inputField.disabled = disabled;
+      if (sendBtn) sendBtn.disabled = disabled;
+    }
 
-// 2. Fonction pour stopper la génération en cours
-function stopGeneration() {
-if (currentAbortController) {
-currentAbortController.abort();
-currentAbortController = null;
-}
-}
-
-// 3. Supprimer un message
-function deleteMessage(elementId) {
-removeElement(elementId);
-}
-
-function removeElement(id) {
-const elem = document.getElementById(id);
-if (elem) elem.remove();
-}
-
-// 4. Modifier un message utilisateur
-function editUserMessage(text) {
-const inputField = document.getElementById("user-chat-input");
-if (inputField) {
-inputField.value = text;
-inputField.focus();
-}
-}
-
-// 5. Copie du texte
-function copyChatText(elementId) {
-const element = document.getElementById(elementId);
-if (!element) return;
-
-navigator.clipboard.writeText(element.innerText).then(() => {
-showToast("Texte copié dans le presse-papier !");
-}).catch(() => {
-showToast("Erreur lors de la copie.");
-});
-}
-
-// 6. Gestion des touches (Entrée = Envoyer, Shift+Entrée = Saut de ligne)
-function handleChatKeyPress(event) {
-if (event.key === 'Enter' && !event.shiftKey) {
-event.preventDefault();
-sendChatMessage();
-}
-}
-
-// 7. Formatage Markdown amélioré (Bonus 3)
-function parseMarkdown(text) {
-let html = escapeHtml(text);
-html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>'); // Blocs de code
-html = html.replace(/`([^`]+)`/g, '<code>$1</code>'); // Code inline
-html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); // Gras
-html = html.replace(/\*(.*?)\*/g, '<i>$1</i>'); // Italique
-html = html.replace(/\n/g, '<br>'); // Sauts de ligne
-return html;
-}
-
-function escapeHtml(text) {
-return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-// 8. Activer/Désactiver le champ de texte pendant l'envoi (Bonus 4)
-function toggleInputState(disabled) {
-const inputField = document.getElementById("user-chat-input");
-const sendBtn = document.getElementById("send-chat-btn");
-if (inputField) inputField.disabled = disabled;
-if (sendBtn) sendBtn.disabled = disabled;
-}
-
-// 9. Système de Toast/Notification personnalisée (Bonus 5)
-function showToast(message) {
-let toast = document.getElementById("chat-toast");
-if (!toast) {
-toast = document.createElement("div");
-toast.id = "chat-toast";
-toast.style.cssText = "position: fixed; bottom: 20px; right: 20px; background: #333; color: #fff; padding: 10px 15px; border-radius: 5px; font-size: 13px; z-index: 9999; transition: opacity 0.3s;";
-document.body.appendChild(toast);
-}
-toast.innerText = message;
-toast.style.opacity = "1";
-setTimeout(() => { toast.style.opacity = "0"; }, 3000);
-}
-
-// Événement Clic sur le bouton Envoyer
-const sendChatBtn = document.getElementById("send-chat-btn");
-if (sendChatBtn) {
-sendChatBtn.addEventListener("click", () => sendChatMessage());
-}
-
-    // --- REWARDED ADS LOGIC (Start.io) ---
+    // --- REWARDED ADS LOGIC ---
     function watchAdForCredits() {
-        const loaderSub = document.getElementById('loader-subtitle');
-        if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
-        
-        const loadModal = document.getElementById('loading-modal');
-        if (loadModal) loadModal.style.display = "flex";
+      const loaderSub = document.getElementById('loader-subtitle');
+      if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
+      
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "flex";
 
-        if (window.AndroidRewardedAd && typeof window.AndroidRewardedAd.showRewardedAd === 'function') {
-            window.AndroidRewardedAd.showRewardedAd();
-        } else {
-            // Simulation kwa ajili ya vivinjari vya kawaida (Browser)
-            setTimeout(() => {
-                if (loadModal) loadModal.style.display = "none";
-                grantAdRewardFromNative();
-            }, 2000);
-        }
+      if (window.AndroidRewardedAd && typeof window.AndroidRewardedAd.showRewardedAd === 'function') {
+        window.AndroidRewardedAd.showRewardedAd();
+      } else {
+        setTimeout(() => {
+          if (loadModal) loadModal.style.display = "none";
+          grantAdRewardFromNative();
+        }, 2000);
+      }
     }
 
     function grantAdRewardFromNative() {
-        const loadModal = document.getElementById('loading-modal');
-        if (loadModal) loadModal.style.display = "none";
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "none";
 
-        let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
-        localStorage.setItem('byaoia_credits', credits);
-        
-        const creditEl = document.getElementById('user-credits');
-        if (creditEl) creditEl.innerText = credits;
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0") + 2;
+      localStorage.setItem('byaoia_credits', credits);
+      
+      const creditEl = document.getElementById('user-credits');
+      if (creditEl) creditEl.innerText = credits;
 
-        showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
+      showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
     }
 
     function onAdFailed() {
-        const loadModal = document.getElementById('loading-modal');
-        if (loadModal) loadModal.style.display = "none";
-        showToast("⚠️ Publicité indisponible pour le moment. Réessayez plus tard.");
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "none";
+      showToast("⚠️ Publicité indisponible.");
     }
 
     // --- IMAGE GENERATION LOGIC ---
@@ -951,7 +732,7 @@ sendChatBtn.addEventListener("click", () => sendChatMessage());
       const promptText = promptInput ? promptInput.value.trim() : "";
 
       if (!promptText) { showToast("Veuillez décrire votre image."); return; }
-      if (credits < 1) { showToast("Crédits épuisés. Redirection..."); switchView('view-recharge'); return; }
+      if (credits < 1) { showToast("Crédits épuisés."); switchView('view-recharge'); return; }
 
       const loaderSub = document.getElementById('loader-subtitle');
       if (loaderSub) loaderSub.innerText = "L'IA façonne votre image...";
@@ -992,12 +773,10 @@ sendChatBtn.addEventListener("click", () => sendChatMessage());
           showToast("Image générée avec succès !");
           if (promptInput) promptInput.value = "";
         } else {
-          const errorMsg = data.error || data.message || "Aucune image reçue.";
-          showToast("Erreur: " + errorMsg);
+          showToast("Erreur: " + (data.error || "Aucune image reçue."));
         }
       } catch (err) {
         if (loadModal) loadModal.style.display = "none";
-        console.error("Fetch error:", err);
         showToast("Erreur de connexion au serveur.");
       }
     }
@@ -1035,7 +814,7 @@ sendChatBtn.addEventListener("click", () => sendChatMessage());
       showToast("Historique effacé.");
     }
 
-        async function downloadCurrentImage() {
+    async function downloadCurrentImage() {
       if (!currentGeneratedImageUrl) {
         showToast("Aucune image à télécharger.");
         return;
@@ -1054,12 +833,9 @@ sendChatBtn.addEventListener("click", () => sendChatMessage());
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        
         window.URL.revokeObjectURL(blobUrl);
-        showToast("Image téléchargée avec succès !");
+        showToast("Image téléchargée !");
       } catch (err) {
-        // Fallback si le fetch CORS bloque
-        console.warn("Blob download failed, using direct link fallback:", err);
         const a = document.createElement('a');
         a.href = currentGeneratedImageUrl;
         a.target = '_blank';
@@ -1067,15 +843,20 @@ sendChatBtn.addEventListener("click", () => sendChatMessage());
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        showToast("Ouverture du lien de téléchargement...");
+        showToast("Ouverture du lien...");
       }
     }
-
 
     function copyText(text) {
       navigator.clipboard.writeText(text);
       showToast(`Copié : ${text}`);
     }
+
+    const sendChatBtn = document.getElementById("send-chat-btn");
+    if (sendChatBtn) {
+      sendChatBtn.addEventListener("click", () => sendChatMessage());
+    }
+
   </script>
 </body>
 </html>
