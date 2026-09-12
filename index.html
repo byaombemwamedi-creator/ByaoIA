@@ -277,22 +277,24 @@
       </div>
     </div>
 
-    <!-- Screen ya Kutengeneza Picha (Generate View) -->
+        <!-- Screen ya Kutengeneza Picha (Generate View) -->
     <div id="view-generate" class="view">
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
-      <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
+      <div id="generator-form-section">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
+        <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
 
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Choisir un style :</p>
-      <div class="style-selector">
-        <div class="style-option active" onclick="setStyle(this, 'Photoréaliste')">📸 Réaliste</div>
-        <div class="style-option" onclick="setStyle(this, '3D Render')">🎨 3D Render</div>
-        <div class="style-option" onclick="setStyle(this, 'Anime')">⛩️ Anime</div>
-        <div class="style-option" onclick="setStyle(this, 'Cyberpunk')">🏙️ Cyberpunk</div>
-        <div class="style-option" onclick="setStyle(this, 'Peinture')">🖌️ Peinture</div>
-        <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏️ Logo</div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Choisir un style :</p>
+        <div class="style-selector">
+          <div class="style-option active" onclick="setStyle(this, 'Photoréaliste')">📸 Réaliste</div>
+          <div class="style-option" onclick="setStyle(this, '3D Render')">🎨 3D Render</div>
+          <div class="style-option" onclick="setStyle(this, 'Anime')">⛩️ Anime</div>
+          <div class="style-option" onclick="setStyle(this, 'Cyberpunk')">🏙️ Cyberpunk</div>
+          <div class="style-option" onclick="setStyle(this, 'Peinture')">🖌️ Peinture</div>
+          <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏️ Logo</div>
+        </div>
+
+        <button class="btn" onclick="generateImage()">✨ Générer l'Image (1 Crédit)</button>
       </div>
-
-      <button class="btn" onclick="generateImage()">✨ Générer l'Image (1 Crédit)</button>
 
       <div style="margin-top: 20px;">
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Résultat :</p>
@@ -310,6 +312,7 @@
         <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub (Start.io)</button>
       </div>
     </div>
+
 
     <!-- Screen ya Galerie -->
     <div id="view-gallery" class="view">
@@ -739,12 +742,42 @@
       showToast("Historique effacé.");
     }
 
-    function downloadCurrentImage() {
-      if (currentGeneratedImageUrl) {
-        window.open(currentGeneratedImageUrl, '_blank');
-        showToast("Ouverture de l'image...");
+        async function downloadCurrentImage() {
+      if (!currentGeneratedImageUrl) {
+        showToast("Aucune image à télécharger.");
+        return;
+      }
+
+      showToast("Téléchargement en cours...");
+      
+      try {
+        const response = await fetch(currentGeneratedImageUrl);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `ByaoIA_${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        window.URL.revokeObjectURL(blobUrl);
+        showToast("Image téléchargée avec succès !");
+      } catch (err) {
+        // Fallback si le fetch CORS bloque
+        console.warn("Blob download failed, using direct link fallback:", err);
+        const a = document.createElement('a');
+        a.href = currentGeneratedImageUrl;
+        a.target = '_blank';
+        a.download = `ByaoIA_${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast("Ouverture du lien de téléchargement...");
       }
     }
+
 
     function copyText(text) {
       navigator.clipboard.writeText(text);
