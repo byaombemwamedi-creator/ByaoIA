@@ -689,6 +689,156 @@ async function generateImageViaWorker(userPrompt, style) {
       navigator.clipboard.writeText(element.innerText).then(() => {
         showToast("Texte copié !");
       });
+// --- AI CHATBOT LOGIC ---
+    async function sendChatMessage(promptText = null, isRetry = false) {
+      const inputField = document.getElementById("user-chat-input");
+      const chatContainer = document.getElementById("chat-container");
+
+      if (!navigator.onLine) {
+        showToast("Pas de connexion Internet.");
+        return;
+      }
+
+      const prompt = promptText || inputField.value.trim();
+      if (!prompt) return;
+
+      lastUserPrompt = prompt;
+      const msgTimestamp = Date.now();
+
+      if (!isRetry) {
+        const escapedPrompt = escapeHtml(prompt);
+        const userMsgId = "user-msg-" + msgTimestamp;
+        chatContainer.innerHTML += `
+          <div id="${userMsgId}" class="chat-message user-msg">
+            ${escapedPrompt}
+            <div style="margin-top: 6px; font-size: 11px; text-align: right; display: flex; gap: 5px; justify-content: flex-end;">
+              <button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️</button>
+              <button onclick="deleteMessage('${userMsgId}')" style="background: rgba(255,0,0,0.3); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">🗑️</button>
+            </div>
+          </div>`;
+      }
+
+      if (!promptText) { inputField.value = ""; }
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      const typingId = "typing-" + msgTimestamp;
+      chatContainer.innerHTML += `
+        <div id="${typingId}" class="chat-message ai-msg typing" style="display:flex; align-items:center; justify-content:space-between;">
+          <div><span></span><span></span><span></span></div>
+          <button onclick="stopGeneration()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 10px;">⏹️ Arrêter</button>
+        </div>`;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      toggleInputState(true);
+      currentAbortController = new AbortController();
+
+      try {
+        // CORRECTION : Appel sécurisé via votre Worker Cloudflare au lieu d'exposer la clé en clair
+        const response = await fetch(AI_BACKEND_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: currentAbortController.signal,
+          body: JSON.stringify({ prompt: prompt })
+        });
+
+        const data = await response.json();
+        removeElement(typingId);
+
+        if (!data.success) {
+          throw new Error(data.error || "Erreur provenant du serveur.");
+        }
+
+        const aiReply = data.response;
+        const msgId = "msg-" + msgTimestamp;
+        const containerId = "container-" + msgTimestamp;
+
+        chatContainer.innerHTML += `
+          <div id="${containerId}" class="chat-message ai-msg">
+            <div id="${msgId}"></div>
+            <div class="ai-actions" style="margin-top: 8px; display: flex; gap: 8px;">
+              <button onclick="copyChatText('${msgId}')">📋 Copier</button>
+              <button onclick="retryChatMessage()">🔄 Réessayer</button>
+              <button onclick="deleteMessage('${containerId}')">🗑️ Supprimer</button>
+            </div>
+          </div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        let i = 0;
+        const speed = 3;
+        let rawText = "";
+
+        function typeWriter() {
+          if (i < aiReply.length) {
+            rawText += aiReply.charAt(i);
+            i++;
+            const targetElem = document.getElementById(msgId);
+            if (targetElem) {
+              targetElem.innerHTML = parseMarkdown(rawText);
+              chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            setTimeout(typeWriter, speed);
+          } else {
+            toggleInputState(false);
+          }
+        }
+        typeWriter();
+
+      } catch (error) {
+        removeElement(typingId);
+        toggleInputState(false);
+
+        if (error.name === 'AbortError') {
+          showToast("Génération interrompue.");
+          return;
+        }
+
+        const errorId = "err-" + Date.now();
+        chatContainer.innerHTML += `
+          <div id="${errorId}" class="chat-message error-msg" style="background: rgba(231, 76, 60, 0.1); border-left: 3px solid #e74c3c; padding: 8px; margin: 5px 0;">
+            ⚠️ Erreur : ${error.message || "Impossible de contacter le serveur."}
+          </div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      } finally {
+        currentAbortController = null;
+      }
+    }
+
+    function retryChatMessage() {
+      if (lastUserPrompt) {
+        sendChatMessage(lastUserPrompt, true);
+      }
+    }
+
+    function stopGeneration() {
+      if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
+      }
+    }
+
+    function deleteMessage(elementId) {
+      removeElement(elementId);
+    }
+
+    function removeElement(id) {
+      const elem = document.getElementById(id);
+      if (elem) elem.remove();
+    }
+
+    function editUserMessage(text) {
+      const inputField = document.getElementById("user-chat-input");
+      if (inputField) {
+        inputField.value = text;
+        inputField.focus();
+      }
+    }
+
+    function copyChatText(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      navigator.clipboard.writeText(element.innerText).then(() => {
+        showToast("Texte copié !");
+      });
     }
 
     function handleChatKeyPress(event) {
