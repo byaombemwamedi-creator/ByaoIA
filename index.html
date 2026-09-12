@@ -240,7 +240,7 @@
       </div>
     </div>
 
-    <!-- Header ya Juu (Bila sehemu za ziada) -->
+    <!-- Header ya Juu -->
     <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
       <div class="app-header">
         <div class="logo-container">
@@ -277,7 +277,7 @@
       </div>
     </div>
 
-        <!-- Screen ya Kutengeneza Picha (Generate View) -->
+    <!-- Screen ya Kutengeneza Picha (Generate View) -->
     <div id="view-generate" class="view">
       <div id="generator-form-section">
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale :</p>
@@ -312,7 +312,6 @@
         <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub</button>
       </div>
     </div>
-
 
     <!-- Screen ya Galerie -->
     <div id="view-gallery" class="view">
@@ -390,7 +389,7 @@
       <div class="nav-item" onclick="switchView('view-contact')"><span class="nav-icon">🌐</span>Contacts</div>
     </div>
 
-    <!-- Modali ya Loading / Subira Kidogo -->
+    <!-- Modali ya Loading -->
     <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100; flex-direction:column;">
       <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
         <div class="spinner"></div>
@@ -402,58 +401,26 @@
   </div>
 
   <script>
-        const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
+    const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
 
-let selectedStyle = "Photoréaliste";
-let currentGeneratedImageUrl = "";
-let lastUserPrompt = "";
-let currentAbortController = null;
+    let selectedStyle = "Photoréaliste";
+    let currentGeneratedImageUrl = "";
+    let lastUserPrompt = "";
+    let currentAbortController = null;
 
-window.onload = async function() { 
-  try {
-    checkUserSession(); 
-  } catch (err) {
-    console.error("Session check error:", err);
-  } finally {
-    const loader = document.getElementById('app-loader');
-    if (loader) {
-      loader.style.opacity = '0';
-      setTimeout(() => loader.style.display = 'none', 500);
-    }
-  }
-};
-async function sendToGemini(userPrompt) {
-  try {
-    const response = await fetch(AI_BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: userPrompt })
-    });
-    const data = await response.json();
-    if (data.success) {
-      return data.response; // Le texte renvoyé par Gemini via Cloudflare
-    } else {
-      throw new Error(data.error);
-    }
-  } catch (err) {
-    console.error("Erreur:", err);
-  }
-}
-async function generateImageViaWorker(userPrompt, style) {
-  try {
-    const response = await fetch(AI_BACKEND_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: userPrompt, style: style })
-    });
-    const data = await response.json();
-    if (data.success) {
-      return data.image_url; // L'URL en base64 de l'image générée
-    }
-  } catch (err) {
-    console.error("Erreur image:", err);
-  }
-}
+    window.onload = async function() { 
+      try {
+        checkUserSession(); 
+      } catch (err) {
+        console.error("Session check error:", err);
+      } finally {
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 500);
+        }
+      }
+    };
 
     function showToast(message) {
       const toast = document.getElementById('toast-notification');
@@ -539,7 +506,7 @@ async function generateImageViaWorker(userPrompt, style) {
       if (viewId === 'view-gallery') renderGallery();
     }
 
-    // --- AI CHATBOT LOGIC ---
+    // --- AI CHATBOT LOGIC (Via Cloudflare Worker) ---
     async function sendChatMessage(promptText = null, isRetry = false) {
       const inputField = document.getElementById("user-chat-input");
       const chatContainer = document.getElementById("chat-container");
@@ -583,157 +550,6 @@ async function generateImageViaWorker(userPrompt, style) {
       currentAbortController = new AbortController();
 
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apikey}`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: currentAbortController.signal,
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-
-        const data = await response.json();
-        removeElement(typingId);
-
-        if (data.error) {
-          throw new Error(data.error.message || "Erreur provenant de l'API Google.");
-        }
-
-        const aiReply = data.candidates[0].content.parts[0].text;
-        const msgId = "msg-" + msgTimestamp;
-        const containerId = "container-" + msgTimestamp;
-
-        chatContainer.innerHTML += `
-          <div id="${containerId}" class="chat-message ai-msg">
-            <div id="${msgId}"></div>
-            <div class="ai-actions" style="margin-top: 8px; display: flex; gap: 8px;">
-              <button onclick="copyChatText('${msgId}')">📋 Copier</button>
-              <button onclick="retryChatMessage()">🔄 Réessayer</button>
-              <button onclick="deleteMessage('${containerId}')">🗑️ Supprimer</button>
-            </div>
-          </div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-
-        let i = 0;
-        const speed = 3;
-        let rawText = "";
-
-        function typeWriter() {
-          if (i < aiReply.length) {
-            rawText += aiReply.charAt(i);
-            i++;
-            const targetElem = document.getElementById(msgId);
-            if (targetElem) {
-              targetElem.innerHTML = parseMarkdown(rawText);
-              chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-            setTimeout(typeWriter, speed);
-          } else {
-            toggleInputState(false);
-          }
-        }
-        typeWriter();
-
-      } catch (error) {
-        removeElement(typingId);
-        toggleInputState(false);
-
-        if (error.name === 'AbortError') {
-          showToast("Génération interrompue.");
-          return;
-        }
-
-        const errorId = "err-" + Date.now();
-        chatContainer.innerHTML += `
-          <div id="${errorId}" class="chat-message error-msg" style="background: rgba(231, 76, 60, 0.1); border-left: 3px solid #e74c3c; padding: 8px; margin: 5px 0;">
-            ⚠️ Erreur : ${error.message || "Impossible de contacter le serveur."}
-          </div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      } finally {
-        currentAbortController = null;
-      }
-    }
-
-    function retryChatMessage() {
-      if (lastUserPrompt) {
-        sendChatMessage(lastUserPrompt, true);
-      }
-    }
-
-    function stopGeneration() {
-      if (currentAbortController) {
-        currentAbortController.abort();
-        currentAbortController = null;
-      }
-    }
-
-    function deleteMessage(elementId) {
-      removeElement(elementId);
-    }
-
-    function removeElement(id) {
-      const elem = document.getElementById(id);
-      if (elem) elem.remove();
-    }
-
-    function editUserMessage(text) {
-      const inputField = document.getElementById("user-chat-input");
-      if (inputField) {
-        inputField.value = text;
-        inputField.focus();
-      }
-    }
-
-    function copyChatText(elementId) {
-      const element = document.getElementById(elementId);
-      if (!element) return;
-      navigator.clipboard.writeText(element.innerText).then(() => {
-        showToast("Texte copié !");
-      });
-// --- AI CHATBOT LOGIC ---
-    async function sendChatMessage(promptText = null, isRetry = false) {
-      const inputField = document.getElementById("user-chat-input");
-      const chatContainer = document.getElementById("chat-container");
-
-      if (!navigator.onLine) {
-        showToast("Pas de connexion Internet.");
-        return;
-      }
-
-      const prompt = promptText || inputField.value.trim();
-      if (!prompt) return;
-
-      lastUserPrompt = prompt;
-      const msgTimestamp = Date.now();
-
-      if (!isRetry) {
-        const escapedPrompt = escapeHtml(prompt);
-        const userMsgId = "user-msg-" + msgTimestamp;
-        chatContainer.innerHTML += `
-          <div id="${userMsgId}" class="chat-message user-msg">
-            ${escapedPrompt}
-            <div style="margin-top: 6px; font-size: 11px; text-align: right; display: flex; gap: 5px; justify-content: flex-end;">
-              <button onclick="editUserMessage('${escapedPrompt.replace(/'/g, "\\'")}')" style="background: rgba(0,0,0,0.2); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">✏️</button>
-              <button onclick="deleteMessage('${userMsgId}')" style="background: rgba(255,0,0,0.3); border: none; color: #fff; padding: 2px 6px; border-radius: 4px; cursor: pointer;">🗑️</button>
-            </div>
-          </div>`;
-      }
-
-      if (!promptText) { inputField.value = ""; }
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      const typingId = "typing-" + msgTimestamp;
-      chatContainer.innerHTML += `
-        <div id="${typingId}" class="chat-message ai-msg typing" style="display:flex; align-items:center; justify-content:space-between;">
-          <div><span></span><span></span><span></span></div>
-          <button onclick="stopGeneration()" style="background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 10px;">⏹️ Arrêter</button>
-        </div>`;
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-
-      toggleInputState(true);
-      currentAbortController = new AbortController();
-
-      try {
-        // CORRECTION : Appel sécurisé via votre Worker Cloudflare au lieu d'exposer la clé en clair
         const response = await fetch(AI_BACKEND_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1037,7 +853,6 @@ async function generateImageViaWorker(userPrompt, style) {
     if (sendChatBtn) {
       sendChatBtn.addEventListener("click", () => sendChatMessage());
     }
-
   </script>
 </body>
 </html>
