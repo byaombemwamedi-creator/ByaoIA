@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ByaoIA - Studio Créatif Pro</title>
   <meta name="theme-color" content="#0f172a">
+<!-- À placer dans le <head> de votre page -->
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/util.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
      :root {
@@ -484,6 +488,14 @@
           <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="doc-ws-desc">Saisissez ou chargez vos données :</p>
           <textarea id="doc-input-text" placeholder="Entrez votre texte, code ou contenu Markdown ici..."></textarea>
           <input type="file" id="doc-file-input" style="display:none;" onchange="previewDocFile(event)">
+          <div class="doc-tool-box">
+  <!-- Sélecteur de fichier document -->
+  <input type="file" id="doc-file-input" accept=".txt,.md,.html,.json" onchange="previewDocFile(event)" style="margin-bottom: 10px;">
+  
+  <!-- Zone de texte ou aperçu -->
+  <textarea id="doc-input-text" placeholder="Entrez votre texte ou chargez un fichier ci-dessus..."></textarea>
+</div>
+
           <button class="btn" style="margin-top:10px;" onclick="processDocTool()">🚀 Exécuter l'action (1 Crédit)</button>
         </div>
       </div>
@@ -588,8 +600,6 @@
 
     let selectedStyle = "Photoréaliste";
     let currentGeneratedImageUrl = "";
-    let currentPhotoFile = null;
-    let currentVideoFile = null;
     let activePhotoTool = '';
     let activeVideoTool = '';
     let activeDocTool = '';
@@ -750,134 +760,360 @@
     }
 
     // --- PHOTO STUDIO LOGIC ---
-    function selectPhotoTool(toolId, title, desc) {
-      activePhotoTool = toolId;
-      document.getElementById('photo-workspace').style.display = 'block';
-      document.getElementById('photo-ws-title').innerText = title;
-      document.getElementById('photo-ws-desc').innerText = desc;
+ async function processPhotoTool() {
+  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+  if (credits < 1) { 
+    showToast("Crédits épuisés."); 
+    switchView('view-recharge'); 
+    return; 
+  }
+  if (!currentPhotoFile) { 
+    showToast("Veuillez d'abord charger une photo."); 
+    return; 
+  }
+
+  const loadModal = document.getElementById('loading-modal');
+  if (loadModal) loadModal.style.display = "flex";
+  document.getElementById('loader-subtitle').innerText = "Traitement photo en cours...";
+
+  try {
+    // 1. Charger l'image source dans un objet Image JavaScript
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(currentPhotoFile);
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = objectUrl;
+    });
+
+    // 2. Créer un Canvas pour manipuler l'image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let sourceWidth = img.width;
+    let sourceHeight = img.height;
+    let targetWidth = sourceWidth;
+    let targetHeight = sourceHeight;
+    let startX = 0;
+    let startY = 0;
+
+    // 3. Appliquer le traitement selon l'outil actif (activePhotoTool)
+    if (activePhotoTool === 'crop') {
+      const ratioSelect = document.getElementById('crop-ratio');
+      const ratioVal = ratioSelect ? ratioSelect.value : '1:1';
       
-      const controls = document.getElementById('photo-controls');
-      if (toolId === 'crop') {
-        controls.innerHTML = `<select id="crop-ratio"><option value="1:1">Carré (1:1)</option><option value="16:9">Paysage (16:9)</option><option value="9:16">Story (9:16)</option></select>`;
-      } else if (toolId === 'filter') {
-        controls.innerHTML = `<select id="filter-type"><option value="grayscale">Noir & Blanc</option><option value="sepia">Sépia Rétro</option><option value="invert">Négatif</option></select>`;
-      } else if (toolId === 'watermark' || toolId === 'textonimage') {
-        controls.innerHTML = `<input type="text" id="photo-extra-text" placeholder="Texte du filigrane ou message">`;
-      } else {
-        controls.innerHTML = ``;
+      if (ratioVal === '1:1') {
+        targetWidth = Math.min(sourceWidth, sourceHeight);
+        targetHeight = targetWidth;
+        startX = (sourceWidth - targetWidth) / 2;
+        startY = (sourceHeight - targetHeight) / 2;
+      } else if (ratioVal === '16:9') {
+        if (sourceWidth / sourceHeight > 16/9) {
+          targetHeight = sourceHeight;
+          targetWidth = sourceHeight * (16/9);
+          startX = (sourceWidth - targetWidth) / 2;
+        } else {
+          targetWidth = sourceWidth;
+          targetHeight = sourceWidth * (9/16);
+          startY = (sourceHeight - targetHeight) / 2;
+        }
+      } else if (ratioVal === '9:16') {
+        if (sourceWidth / sourceHeight > 9/16) {
+          targetHeight = sourceHeight;
+          targetWidth = sourceHeight * (9/16);
+          startX = (sourceWidth - targetWidth) / 2;
+        } else {
+          targetWidth = sourceWidth;
+          targetHeight = sourceWidth * (16/9);
+          startY = (sourceHeight - targetHeight) / 2;
+        }
+      }
+      
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      ctx.drawImage(img, startX, startY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
+
+    } else {
+      // Pour les filtres et le texte, on conserve les dimensions originales
+      canvas.width = sourceWidth;
+      canvas.height = sourceHeight;
+      ctx.drawImage(img, 0, 0);
+
+      if (activePhotoTool === 'filter') {
+        const filterType = document.getElementById('filter-type')?.value;
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+
+          if (filterType === 'grayscale') {
+            const avg = 0.3 * r + 0.59 * g + 0.11 * b;
+            data[i] = avg;
+            data[i + 1] = avg;
+            data[i + 2] = avg;
+          } else if (filterType === 'sepia') {
+            data[i]     = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+            data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+            data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+          } else if (filterType === 'invert') {
+            data[i]     = 255 - r;
+            data[i + 1] = 255 - g;
+            data[i + 2] = 255 - b;
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+      } else if (activePhotoTool === 'watermark' || activePhotoTool === 'textonimage') {
+        const textInput = document.getElementById('photo-extra-text');
+        const customText = textInput && textInput.value.trim() !== '' ? textInput.value : 'BYAO Studio';
+        
+        // Configuration du style du texte incrusté
+        ctx.font = `bold ${Math.max(24, Math.floor(canvas.width / 25))}px sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 4;
+        
+        const metrics = ctx.measureText(customText);
+        const x = canvas.width - metrics.width - 40;
+        const y = canvas.height - 40;
+        
+        ctx.strokeText(customText, x, y);
+        ctx.fillText(customText, x, y);
       }
     }
 
-    function previewPhotoFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      currentPhotoFile = file;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('photo-preview-box').innerHTML = `<img src="${e.target.result}" alt="Aperçu photo">`;
-      };
-      reader.readAsDataURL(file);
+    // 4. Générer l'URL de l'image modifiée et mettre à jour l'aperçu
+    const processedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    document.getElementById('photo-preview-box').innerHTML = `<img src="${processedDataUrl}" alt="Aperçu photo traité">`;
+
+    // 5. Gestion des crédits et de l'interface
+    credits -= 1;
+    localStorage.setItem('byaoia_credits', credits);
+    document.getElementById('user-credits').innerText = credits;
+    
+    if (loadModal) loadModal.style.display = "none";
+    
+    // 6. Publicité et enregistrement final
+    showInterstitialAd(() => {
+      showToast("✨ Photo traitée avec succès !");
+      saveToGallery('Photo Studio: ' + activePhotoTool, processedDataUrl);
+    });
+
+    URL.revokeObjectURL(objectUrl);
+
+  } catch (error) {
+    console.error("Erreur lors du traitement photo :", error);
+    if (loadModal) loadModal.style.display = "none";
+    showToast("Une erreur est survenue lors du traitement de la photo.");
+  }
+}
+
+// Instance globale de FFmpeg (chargée paresseusement pour optimiser les performances)
+let ffmpegInstance = null;
+
+async function getFFmpeg() {
+  if (ffmpegInstance) return ffmpegInstance;
+  
+  const { FFmpeg } = FFmpegWASM;
+  const ffmpeg = new FFmpeg();
+  
+  const { fetchFile } = FFmpegUtil;
+  
+  // Chargement des cores de FFmpeg depuis le CDN officiel
+  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+  await ffmpeg.load({
+    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+  });
+  
+  ffmpegInstance = { ffmpeg, fetchFile };
+  return ffmpegInstance;
+}
+
+async function processVideoTool() {
+  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+  if (credits < 1) { 
+    showToast("Crédits épuisés."); 
+    switchView('view-recharge'); 
+    return; 
+  }
+  if (!currentVideoFile) { 
+    showToast("Veuillez d'abord charger une vidéo."); 
+    return; 
+  }
+
+  const loadModal = document.getElementById('loading-modal');
+  if (loadModal) loadModal.style.display = "flex";
+  
+  const subtitleElem = document.getElementById('loader-subtitle');
+  if (subtitleElem) subtitleElem.innerText = "Initialisation du moteur vidéo...";
+
+  try {
+    // 1. Charger le moteur FFmpeg WebAssembly
+    const { ffmpeg, fetchFile } = await getFFmpeg();
+    
+    if (subtitleElem) subtitleElem.innerText = "Traitement et encodage en cours...";
+
+    // 2. Écrire le fichier source dans le système de fichiers virtuel de FFmpeg
+    const inputFileName = 'input.mp4';
+    const outputFileName = 'output.mp4';
+    
+    await ffmpeg.writeFile(inputFileName, await fetchFile(currentVideoFile));
+
+    // 3. Appliquer le traitement réel en fonction de l'outil actif (activeVideoTool)
+    // Vous pouvez adapter ces commandes selon vos besoins précis (ex: compression, extraction audio, filtre N&B, etc.)
+    let ffmpegArgs = [];
+    switch (activeVideoTool) {
+      case 'compress':
+        // Compression / Réduction du bitrate
+        ffmpegArgs = ['-i', inputFileName, '-vcodec', 'libx264', '-crf', '28', outputFileName];
+        break;
+      case 'grayscale':
+        // Filtre noir et blanc
+        ffmpegArgs = ['-i', inputFileName, '-vf', 'colorchannelmixer=.3:.4:.3:0:.3:.4:.3:0:.3:.4:.3', outputFileName];
+        break;
+      case 'extract-audio':
+        // Extraction de la piste audio (conversion en MP3)
+        // Note: adapter l'extension de sortie si besoin (.mp3)
+        break;
+      default:
+        // Action par défaut : ré-encodage standard propre
+        ffmpegArgs = ['-i', inputFileName, '-c:v', 'libx264', '-preset', 'fast', outputFileName];
+        break;
     }
 
-    async function processPhotoTool() {
-      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-      if (credits < 1) { showToast("Crédits épuisés."); switchView('view-recharge'); return; }
-      if (!currentPhotoFile) { showToast("Veuillez d'abord charger une photo."); return; }
+    // Exécution de la commande FFmpeg
+    await ffmpeg.exec(ffmpegArgs);
 
-      const loadModal = document.getElementById('loading-modal');
-      if (loadModal) loadModal.style.display = "flex";
-      document.getElementById('loader-subtitle').innerText = "Traitement photo hors-ligne en cours...";
+    // 4. Récupération du fichier traité
+    const data = await ffmpeg.readFile(outputFileName);
+    const processedBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const processedUrl = URL.createObjectURL(processedBlob);
 
-      setTimeout(() => {
-        credits -= 1;
-        localStorage.setItem('byaoia_credits', credits);
-        document.getElementById('user-credits').innerText = credits;
-        if (loadModal) loadModal.style.display = "none";
-        
-        // Affichage de la publicité après la génération
-        showInterstitialAd(() => {
-          showToast("✨ Photo traitée avec succès !");
-          const previewImg = document.querySelector('#photo-preview-box img');
-          if (previewImg) {
-            saveToGallery('Photo Studio: ' + activePhotoTool, previewImg.src);
-          }
-        });
-      }, 1500);
-    }
+    // Mettre à jour l'aperçu avec la vidéo traitée
+    document.getElementById('video-preview-box').innerHTML = `<video controls src="${processedUrl}"></video>`;
 
-    // --- VIDEO STUDIO LOGIC ---
-    function selectVideoTool(toolId, title, desc) {
-      activeVideoTool = toolId;
-      document.getElementById('video-workspace').style.display = 'block';
-      document.getElementById('video-ws-title').innerText = title;
-      document.getElementById('video-ws-desc').innerText = desc;
-    }
+    // 5. Déduction des crédits
+    credits -= 1;
+    localStorage.setItem('byaoia_credits', credits);
+    document.getElementById('user-credits').innerText = credits;
+    
+    if (loadModal) loadModal.style.display = "none";
+    
+    // 6. Affichage de la publicité après la génération réussie
+    showInterstitialAd(() => {
+      showToast("🎬 Vidéo traitée avec succès !");
+      saveToGallery('Vidéo Studio: ' + activeVideoTool, processedUrl);
+    });
 
-    function previewVideoFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      currentVideoFile = file;
-      const url = URL.createObjectURL(file);
-      document.getElementById('video-preview-box').innerHTML = `<video controls src="${url}"></video>`;
-    }
+  } catch (error) {
+    console.error("Erreur lors du traitement vidéo :", error);
+    if (loadModal) loadModal.style.display = "none";
+    showToast("Une erreur est survenue lors du traitement de la vidéo.");
+  }
+}
 
-    async function processVideoTool() {
-      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-      if (credits < 1) { showToast("Crédits épuisés."); switchView('view-recharge'); return; }
-      if (!currentVideoFile) { showToast("Veuillez d'abord charger une vidéo."); return; }
-
-      const loadModal = document.getElementById('loading-modal');
-      if (loadModal) loadModal.style.display = "flex";
-      document.getElementById('loader-subtitle').innerText = "Encodage vidéo hors-ligne en cours...";
-
-      setTimeout(() => {
-        credits -= 1;
-        localStorage.setItem('byaoia_credits', credits);
-        document.getElementById('user-credits').innerText = credits;
-        if (loadModal) loadModal.style.display = "none";
-        
-        // Affichage de la publicité après la génération
-        showInterstitialAd(() => {
-          showToast("🎬 Vidéo traitée avec succès !");
-          const previewVideo = document.querySelector('#video-preview-box video');
-          if (previewVideo) {
-            saveToGallery('Vidéo Studio: ' + activeVideoTool, previewVideo.src);
-          }
-        });
-      }, 2000);
-    }
 
     // --- DOC STUDIO LOGIC ---
-    function selectDocTool(toolId, title, desc) {
-      activeDocTool = toolId;
-      document.getElementById('doc-workspace').style.display = 'block';
-      document.getElementById('doc-ws-title').innerText = title;
-      document.getElementById('doc-ws-desc').innerText = desc;
+async function processDocTool() {
+  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+  if (credits < 1) { 
+    showToast("Crédits épuisés."); 
+    switchView('view-recharge'); 
+    return; 
+  }
+
+  const docTextElement = document.getElementById('doc-input-text');
+  const docText = docTextElement ? docTextElement.value.trim() : "";
+  
+  if (!docText && activeDocTool === 'noteseditor') { 
+    showToast("Veuillez saisir du texte."); 
+    return; 
+  }
+
+  const loadModal = document.getElementById('loading-modal');
+  if (loadModal) loadModal.style.display = "flex";
+  
+  const subtitleElem = document.getElementById('loader-subtitle');
+  if (subtitleElem) subtitleElem.innerText = "Compilation et mise en page du document...";
+
+  try {
+    let generatedBlob = null;
+    let fileName = "document_byaoia.pdf";
+
+    // Traitement réel selon l'outil sélectionné
+    if (activeDocTool === 'noteseditor' || activeDocTool === 'pdfexport') {
+      // Génération d'un fichier PDF propre avec jsPDF
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Paramètres de mise en page
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      
+      // En-tête du document généré
+      doc.setTextColor(40, 40, 40);
+      doc.text("BYAO Studio - Document Officiel", 20, 20);
+      doc.setLineWidth(0.5);
+      doc.line(20, 25, 190, 25);
+
+      // Corps du texte saisi par l'utilisateur (avec gestion du retour à la ligne automatique)
+      const splitText = doc.splitTextToSize(docText || "Aucun contenu fourni.", 170);
+      doc.text(splitText, 20, 35);
+
+      // Pied de page
+      doc.setFontSize(10);
+      doc.setTextColor(150, 150, 150);
+      doc.text("Généré par BYAOIA Studio", 20, 285);
+
+      // Sortie sous forme de Blob PDF
+      generatedBlob = doc.output('blob');
+      fileName = `note_${Date.now()}.pdf`;
+
+    } else {
+      // Export texte brut (TXT) par défaut ou autre format
+      generatedBlob = new Blob([docText], { type: 'text/plain;charset=utf-8' });
+      fileName = `document_${Date.now()}.txt`;
     }
 
-    async function processDocTool() {
-      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-      if (credits < 1) { showToast("Crédits épuisés."); switchView('view-recharge'); return; }
+    // Création d'une URL de téléchargement locale
+    const downloadUrl = URL.createObjectURL(generatedBlob);
 
-      const docText = document.getElementById('doc-input-text').value.trim();
-      if (!docText && activeDocTool === 'noteseditor') { showToast("Veuillez saisir du texte."); return; }
+    // Mettre à jour les crédits
+    credits -= 1;
+    localStorage.setItem('byaoia_credits', credits);
+    document.getElementById('user-credits').innerText = credits;
+    
+    if (loadModal) loadModal.style.display = "none";
+    
+    // Affichage de la publicité après la génération réussie
+    showInterstitialAd(() => {
+      showToast("📄 Document généré avec succès !");
+      
+      // Déclenchement automatique du téléchargement du fichier
+      const downloadLink = document.createElement('a');
+      downloadLink.href = downloadUrl;
+      downloadLink.download = fileName;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
 
-      const loadModal = document.getElementById('loading-modal');
-      if (loadModal) loadModal.style.display = "flex";
-      document.getElementById('loader-subtitle').innerText = "Compilation du document en cours...";
+      // Sauvegarde optionnelle dans la galerie/historique si la fonction existe
+      if (typeof saveToGallery === 'function') {
+        saveToGallery('Doc Studio: ' + activeDocTool, downloadUrl);
+      }
+    });
 
-      setTimeout(() => {
-        credits -= 1;
-        localStorage.setItem('byaoia_credits', credits);
-        document.getElementById('user-credits').innerText = credits;
-        if (loadModal) loadModal.style.display = "none";
-        
-        // Affichage de la publicité après la génération
-        showInterstitialAd(() => {
-          showToast("📄 Document généré / traité avec succès !");
-        });
-      }, 1500);
-    }
+  } catch (error) {
+    console.error("Erreur lors de la compilation du document :", error);
+    if (loadModal) loadModal.style.display = "none";
+    showToast("Une erreur est survenue lors de la génération du document.");
+  }
+}
 
     // --- REWARDED ADS LOGIC ---
     function watchAdForCredits() {
@@ -1040,6 +1276,125 @@
       navigator.clipboard.writeText(text);
       showToast(`Copié : ${text}`);
     }
+// --- SÉLECTION DES OUTILS (GLOBAL SCOPE FIX) ---
+
+function selectPhotoTool(toolId, title, desc) {
+  window.activePhotoTool = toolId;
+  
+  const workspace = document.getElementById('photo-workspace');
+  if (workspace) workspace.style.display = 'block';
+  
+  const titleElem = document.getElementById('photo-ws-title');
+  if (titleElem) titleElem.innerText = title;
+  
+  const descElem = document.getElementById('photo-ws-desc');
+  if (descElem) descElem.innerText = desc;
+  
+  const controls = document.getElementById('photo-controls');
+  if (controls) {
+    if (toolId === 'crop') {
+      controls.innerHTML = `<select id="crop-ratio"><option value="1:1">Carré (1:1)</option><option value="16:9">Paysage (16:9)</option><option value="9:16">Story (9:16)</option></select>`;
+    } else if (toolId === 'filter') {
+      controls.innerHTML = `<select id="filter-type"><option value="grayscale">Noir & Blanc</option><option value="sepia">Sépia Rétro</option><option value="invert">Négatif</option></select>`;
+    } else if (toolId === 'watermark' || toolId === 'textonimage') {
+      controls.innerHTML = `<input type="text" id="photo-extra-text" placeholder="Texte du filigrane ou message">`;
+    } else {
+      controls.innerHTML = ``;
+    }
+  }
+}
+
+function selectVideoTool(toolId, title, desc) {
+  window.activeVideoTool = toolId;
+  
+  const workspace = document.getElementById('video-workspace');
+  if (workspace) workspace.style.display = 'block';
+  
+  const titleElem = document.getElementById('video-ws-title');
+  if (titleElem) titleElem.innerText = title;
+  
+  const descElem = document.getElementById('video-ws-desc');
+  if (descElem) descElem.innerText = desc;
+}
+
+function selectDocTool(toolId, title, desc) {
+  window.activeDocTool = toolId;
+  
+  const workspace = document.getElementById('doc-workspace');
+  if (workspace) workspace.style.display = 'block';
+  
+  const titleElem = document.getElementById('doc-ws-title');
+  if (titleElem) titleElem.innerText = title;
+  
+  const descElem = document.getElementById('doc-ws-desc');
+  if (descElem) descElem.innerText = desc;
+}
+
+// ⚠️ TRÈS IMPORTANT : Force l'exposition globale des fonctions 
+// si votre script est chargé en tant que module ES6 (<script type="module">)
+window.selectPhotoTool = selectPhotoTool;
+window.selectVideoTool = selectVideoTool;
+window.selectDocTool = selectDocTool;
+let currentPhotoFile = null;
+let currentVideoFile = null;
+let currentDocFile = null;
+
+// Prévisualisation Photo
+function previewPhotoFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  currentPhotoFile = file;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const previewBox = document.getElementById('photo-preview-box');
+    if (previewBox) {
+      previewBox.innerHTML = `<img src="${e.target.result}" alt="Aperçu photo" style="max-width:100%; max-height:220px; border-radius:8px; object-fit:contain;">`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Prévisualisation Vidéo
+function previewVideoFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  currentVideoFile = file;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const previewBox = document.getElementById('video-preview-box');
+    if (previewBox) {
+      previewBox.innerHTML = `<video controls src="${e.target.result}" style="max-width:100%; max-height:220px; border-radius:8px;"></video>`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// Exposition globale pour éviter les erreurs ReferenceError
+window.previewPhotoFile = previewPhotoFile;
+window.previewVideoFile = previewVideoFile;
+function previewDocFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  currentDocFile = file;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const textArea = document.getElementById('doc-input-text');
+    if (textArea) {
+      // Remplit automatiquement le champ de texte avec le contenu du fichier chargé
+      textArea.value = e.target.result;
+    }
+    showToast(`📁 Fichier chargé : ${file.name}`);
+  };
+  
+  // Lecture du fichier en tant que texte (compatible .txt, .md, .html)
+  reader.readAsText(file);
+}
+
+// Exposition globale
+window.previewDocFile = previewDocFile;
 
   </script>
 </body>
