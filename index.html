@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ByaoIA - Studio Créatif Pro</title>
   <meta name="theme-color" content="#0f172a">
-<!-- À placer dans le <head> de votre page -->
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/util.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- À placer dans le <head> de votre page -->
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/util.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
      :root {
@@ -92,6 +92,26 @@
     .header-logo { width: 34px; height: 34px; }
     .logo-badge { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; font-size: 1.3rem; }
     
+    .menu-toggle-btn { background: #1e293b; border: 1px solid #334155; color: #fff; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .menu-toggle-btn:hover { border-color: var(--primary); }
+
+    /* --- SIDEBAR KUSHOTO (INAYOJIFUNGA NA KUFUNGUKA) --- */
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s ease; }
+    .sidebar-overlay.open { display: block; opacity: 1; }
+
+    .left-sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: #0f172a; border-right: 1px solid #334155; z-index: 1001; display: flex; flex-direction: column; padding: 20px; transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+    .left-sidebar.open { left: 0; }
+    
+    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+    .sidebar-close { background: none; border: none; color: var(--text-muted); font-size: 1.3rem; cursor: pointer; }
+    .sidebar-close:hover { color: #fff; }
+
+    .sidebar-menu-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex-grow: 1; }
+    .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; transition: 0.2s; text-decoration: none; background: transparent; border: none; width: 100%; text-align: left; }
+    .sidebar-item:hover { background: #1e293b; color: #fff; }
+    .sidebar-item.active { background: #2d1b4e; color: #c084fc; border: 1px solid var(--primary); font-weight: bold; }
+    .sidebar-icon { font-size: 1.2rem; }
+
     .credit-badge { 
       background: #1e1b4b; 
       border: 1px solid var(--primary); 
@@ -183,7 +203,30 @@
     .workspace-box { background: var(--card-bg); border: 1px solid #334155; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
     .workspace-title { font-size: 0.95rem; font-weight: bold; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
-    #toast-notification { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1e293b; color: #fff; border: 1px solid var(--primary); padding: 10px 22px; border-radius: 30px; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 1000; pointer-events: none; text-align: center; white-space: nowrap; }
+    /* --- TOAST NOTIFICATION ILIYOBORESHWA KAMA PICHA 1 --- */
+    #toast-notification { 
+      position: fixed; 
+      bottom: 25px; 
+      left: 50%; 
+      transform: translateX(-50%) translateY(120px); 
+      background: linear-gradient(135deg, #1e293b, #0f172a); 
+      color: #fff; 
+      border: 1px solid var(--primary); 
+      padding: 14px 24px; 
+      border-radius: 16px; 
+      font-size: 0.9rem; 
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6); 
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; 
+      opacity: 0; 
+      z-index: 1100; 
+      pointer-events: none; 
+      text-align: center; 
+      max-width: 90%;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     #toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
     .payment-box { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; margin-bottom: 12px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
@@ -202,6 +245,26 @@
 
     .spinner { width: 40px; height: 40px; border: 4px solid #334155; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* New Features Styles */
+    .daily-checkin-banner { background: linear-gradient(135deg, #2d1b4e, #1e1b4b); border: 1px solid var(--primary); border-radius: 14px; padding: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .streak-days { display: flex; gap: 5px; margin-top: 6px; }
+    .streak-day { width: 26px; height: 26px; border-radius: 50%; background: #334155; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; font-weight: bold; }
+    .streak-day.completed { background: var(--success); color: #fff; }
+    .streak-day.active { background: var(--primary); color: #fff; border: 1px solid var(--accent); }
+
+    .community-post { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+    .community-header { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid #334155; }
+    .community-img { width: 100%; max-height: 250px; object-fit: cover; }
+    .community-footer { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .like-btn { background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.9rem; }
+    .like-btn.liked { color: var(--accent); }
+
+    .challenge-card { background: linear-gradient(135deg, #182232, #2d1b4e); border: 1px solid var(--accent); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    
+    .tutorial-card { background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; transition: 0.2s; }
+    .tutorial-card:hover { border-color: var(--primary); background: #182232; }
+    .tutorial-icon { font-size: 2rem; background: #334155; padding: 10px; border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -213,9 +276,33 @@
 
   <div class="app-screen">
 
-    <div id="toast-notification">Notification</div>
+    <!-- Toast Notification Boreshwa -->
+    <div id="toast-notification">
+      <span>💬</span> <span id="toast-text">Notification</span>
+    </div>
 
-    <div id="view-auth" class="view active">
+    <!-- SIDEBAR KUSHOTO NA OVERLAY -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="left-sidebar" id="left-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-container">
+          <div class="logo-badge" style="font-size: 1.1rem;">ByaoIA Pro</div>
+        </div>
+        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+      </div>
+      <div class="sidebar-menu-list">
+        <button class="sidebar-item active" onclick="switchView('view-generate'); toggleSidebar();"><span class="sidebar-icon">✨</span> IA Image</button>
+        <button class="sidebar-item" onclick="switchView('view-community'); toggleSidebar();"><span class="sidebar-icon">🌍</span> Partager</button>
+        <button class="sidebar-item" onclick="switchView('view-challenges'); toggleSidebar();"><span class="sidebar-icon">🏆</span> Challenge</button>
+        <button class="sidebar-item" onclick="switchView('view-tutorials'); toggleSidebar();"><span class="sidebar-icon">💡</span> instructions</button>
+        <button class="sidebar-item" onclick="switchView('view-studio'); toggleSidebar();"><span class="sidebar-icon">🎬</span> Studio</button>
+        <button class="sidebar-item" onclick="switchView('view-gallery'); toggleSidebar();"><span class="sidebar-icon">🖼️</span> Galerie</button>
+        <button class="sidebar-item" onclick="switchView('view-recharge'); toggleSidebar();"><span class="sidebar-icon">⚡</span> Recharge</button>
+        <button class="sidebar-item" onclick="switchView('view-contact'); toggleSidebar();"><span class="sidebar-icon">🌐</span> Contacts & Support</button>
+      </div>
+    </div>
+
+    <div id="view-auth" class="view">
       <div class="auth-container">
         <svg class="auth-logo" viewBox="0 0 512 512">
           <defs>
@@ -243,6 +330,7 @@
     <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
       <div class="app-header">
         <div class="logo-container">
+          <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
           <svg class="header-logo" viewBox="0 0 512 512">
             <rect width="512" height="512" rx="115" fill="#0f172a"/>
             <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z" fill="#8b5cf6"/>
@@ -257,6 +345,24 @@
     </div>
 
     <div id="view-generate" class="view">
+      <!-- Feature 1: Daily Check-in & Streaks -->
+      <div class="daily-checkin-banner">
+        <div>
+          <p style="font-weight: bold; font-size: 0.9rem; color: #c084fc;">📅 Récompense Quotidienne</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted);" id="streak-status-text">Récupérez vos crédits du jour !</p>
+          <div class="streak-days" id="streak-days-container">
+            <div class="streak-day">1</div>
+            <div class="streak-day">2</div>
+            <div class="streak-day">3</div>
+            <div class="streak-day">4</div>
+            <div class="streak-day">5</div>
+            <div class="streak-day">6</div>
+            <div class="streak-day">7</div>
+          </div>
+        </div>
+        <button class="btn" style="width: auto; padding: 10px 14px; font-size: 0.8rem;" onclick="claimDailyReward()">🎁 Réclamer</button>
+      </div>
+
       <div id="generator-form-section">
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale (IA Générative) :</p>
         <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
@@ -268,7 +374,7 @@
           <div class="style-option" onclick="setStyle(this, 'Anime')">⛩️ Anime</div>
           <div class="style-option" onclick="setStyle(this, 'Cyberpunk')">🏙️ Cyberpunk</div>
           <div class="style-option" onclick="setStyle(this, 'Peinture')">🖌️ Peinture</div>
-          <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏️ Logo</div>
+          <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏️️ Logo</div>
         </div>
 
         <button class="btn" onclick="generateImage()">✨ Générer l'Image (1 Crédit)</button>
@@ -291,6 +397,73 @@
       </div>
     </div>
 
+    <!-- Feature 2: Community Feed / "Explore" -->
+    <div id="view-community" class="view">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 1.1rem;">🌍 Communauté (Explore)</h3>
+        <button class="btn" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="publishToCommunity()">+ Publier</button>
+      </div>
+      <div id="community-feed-container">
+        <!-- Dynamically filled community posts -->
+      </div>
+    </div>
+
+    <!-- Feature 3: Weekly Creative Challenges -->
+    <div id="view-challenges" class="view">
+      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">🏆 Challenges de Créativité de chaque semaine </h3>
+      
+      <div class="challenge-card">
+        <p style="font-weight: bold; font-size: 1rem; color: var(--accent); margin-bottom: 4px;">✨ Paysage Cyberpunk le Plus beau</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Créer une image plus belle de Cyberpunk puis l'envoyer sur le challenge et gagner plus de 5 Crédits!</p>
+        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="joinCurrentChallenge()">Participer au  Challenge</button>
+      </div>
+
+      <h4 style="font-size: 0.95rem; margin: 16px 0 8px 0;">🏅 La liste de Gagnants  (Leaderboard)</h4>
+      <div style="background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 12px;">
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem;">
+          <span>🥇 1. Dorthea Byaombe</span>
+          <span style="color: var(--success); font-weight: bold;">450 Likes</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem;">
+          <span>🥈 2.David alembe</span>
+          <span style="color: var(--success); font-weight: bold;">380 Likes</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.85rem;">
+          <span>🥉 3. Trifaina Ubato.</span>
+          <span style="color: var(--success); font-weight: bold;">310 Likes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 4: Mini Tutorials / "Tips & Tricks" -->
+    <div id="view-tutorials" class="view">
+      <h3 style="margin-bottom: 14px; font-size: 1.1rem;">💡 les modalités & les instructions</h3>
+      
+      <div class="tutorial-card" onclick="openTutorial('logo')">
+        <div class="tutorial-icon">✏️</div>
+        <div>
+          <p style="font-weight: bold; font-size: 0.9rem;">Façon de Créer Une  meilleure logo en 30</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">Jifunze kutumia mtindo wa Logo Design kwa ufanisi mkubwa.</p>
+        </div>
+      </div>
+
+      <div class="tutorial-card" onclick="openTutorial('cyberpunk')">
+        <div class="tutorial-icon">🏙️</div>
+        <div>
+          <p style="font-weight: bold; font-size: 0.9rem;">Siri ya mandhari ya Cyberpunk yenye mvuto</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">Maneno sahihi (prompts) ya kuandika ili kupata matokeo mazuri.</p>
+        </div>
+      </div>
+
+      <div class="tutorial-card" onclick="openTutorial('video')">
+        <div class="tutorial-icon">🎬</div>
+        <div>
+          <p style="font-weight: bold; font-size: 0.9rem;">Mbinu za kufanya video zako zivutie zaidi</p>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">Vidokezo vya utumiaji wa Video Studio bila kukwama.</p>
+        </div>
+      </div>
+    </div>
+
     <div id="view-studio" class="view">
       <div class="studio-header">
         <button class="studio-tab-btn active" onclick="switchStudioTab('photo')">📸 Photo Studio</button>
@@ -301,7 +474,7 @@
       <div id="studio-photo" class="studio-section active">
         <div class="feature-grid">
           <div class="feature-card" onclick="selectPhotoTool('crop', '✂️ Recadrer & Redimensionner', 'Sélectionnez une image et définissez les dimensions souhaitées.')">
-            <div class="feature-icon">✂️</div>
+            <div class="feature-icon">✂️️</div>
             <div class="feature-title">1. Recadrer & Redim.</div>
             <div class="feature-desc">Ajustez la taille et format</div>
           </div>
@@ -330,7 +503,7 @@
             <div class="feature-title">6. Color Grading</div>
             <div class="feature-desc">Ajustement colorimétrique</div>
           </div>
-          <div class="feature-card" onclick="selectPhotoTool('collage', '🖼️ Collage & Grille', 'Assemblez plusieurs photos en une seule composition.')">
+          <div class="feature-card" onclick="selectPhotoTool('collage', '🖼 Collage & Grille', 'Assemblez plusieurs photos en une seule composition.')">
             <div class="feature-icon">🖼️</div>
             <div class="feature-title">7. Collage & Grille</div>
             <div class="feature-desc">Multipages & cadres</div>
@@ -436,7 +609,7 @@
             <div class="feature-title">1. Fusion de PDF</div>
             <div class="feature-desc">Assemblage de documents</div>
           </div>
-          <div class="feature-card" onclick="selectDocTool('pdfsplit', '✂️ Diviser un PDF', 'Séparez un grand document en plusieurs fichiers.')">
+          <div class="feature-card" onclick="selectDocTool('pdfsplit', '✂ Diviser un PDF', 'Séparez un grand document en plusieurs fichiers.')">
             <div class="feature-icon">✂️</div>
             <div class="feature-title">2. Division de PDF</div>
             <div class="feature-desc">Extraction de pages</div>
@@ -486,16 +659,12 @@
         <div class="workspace-box" id="doc-workspace" style="display:none;">
           <div class="workspace-title" id="doc-ws-title">📄 Espace de Travail Documents</div>
           <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="doc-ws-desc">Saisissez ou chargez vos données :</p>
-          <textarea id="doc-input-text" placeholder="Entrez votre texte, code ou contenu Markdown ici..."></textarea>
-          <input type="file" id="doc-file-input" style="display:none;" onchange="previewDocFile(event)">
           <div class="doc-tool-box">
-  <!-- Sélecteur de fichier document -->
-  <input type="file" id="doc-file-input" accept=".txt,.md,.html,.json" onchange="previewDocFile(event)" style="margin-bottom: 10px;">
-  
-  <!-- Zone de texte ou aperçu -->
-  <textarea id="doc-input-text" placeholder="Entrez votre texte ou chargez un fichier ci-dessus..."></textarea>
-</div>
-
+            <!-- Sélecteur de fichier document -->
+            <input type="file" id="doc-file-input" accept=".txt,.md,.html,.json" onchange="previewDocFile(event)" style="margin-bottom: 10px;">
+            <!-- Zone de texte ou aperçu -->
+            <textarea id="doc-input-text" placeholder="Entrez votre texte ou chargez un fichier ci-dessus..."></textarea>
+          </div>
           <button class="btn" style="margin-top:10px;" onclick="processDocTool()">🚀 Exécuter l'action (1 Crédit)</button>
         </div>
       </div>
@@ -568,11 +737,10 @@
 
     <div class="bottom-nav" id="bottom-navigation" style="display: none;">
       <div class="nav-item active" onclick="switchView('view-generate')"><span class="nav-icon">✨</span>IA Image</div>
-      <div class="nav-item" onclick="switchView('view-studio')"><span class="nav-icon">🎬</span>Studio Pro</div>
+
+      <div class="nav-item" onclick="switchView('view-studio')"><span class="nav-icon">🎬</span>Studio</div>
       <div class="nav-item" onclick="switchView('view-gallery')"><span class="nav-icon">🖼️</span>Galerie</div>
       <div class="nav-item" onclick="switchView('view-recharge')"><span class="nav-icon">⚡</span>Recharge</div>
-      <div class="nav-item" onclick="switchView('view-contact')"><span class="nav-icon">🌐</span>Contacts</div>
-    </div>
 
     <div id="interstitial-ad-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
       <div style="background: var(--card-bg); border: 1px solid var(--primary); border-radius: 16px; width: 100%; max-width: 360px; padding: 20px; text-align: center; position: relative;">
@@ -607,6 +775,7 @@
     window.onload = function() { 
       try {
         checkUserSession(); 
+        initDailyCheckinUI();
       } catch (err) {
         console.error("Session check error:", err);
       } finally {
@@ -618,12 +787,23 @@
       }
     };
 
+    // --- KAZI YA KUFUNGUA NA KUFUNGA SIDEBAR YA KUSHOTO ---
+    function toggleSidebar() {
+      const sidebar = document.getElementById('left-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+      }
+    }
+
     function showToast(message) {
       const toast = document.getElementById('toast-notification');
-      if (toast) {
-        toast.innerText = message;
+      const toastText = document.getElementById('toast-text');
+      if (toast && toastText) {
+        toastText.innerText = message;
         toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        setTimeout(() => { toast.classList.remove('show'); }, 3500);
       }
       
       const loadModal = document.getElementById('loading-modal');
@@ -714,7 +894,7 @@
       document.getElementById('main-header').style.display = "block";
       document.getElementById('bottom-navigation').style.display = "flex";
       initUserCredits();
-      switchView('view-generate'); // Définie obligatoirement comme page d'accueil par défaut
+      switchView('view-generate');
     }
 
     function initUserCredits() {
@@ -733,14 +913,31 @@
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+
       const targetView = document.getElementById(viewId);
       if (targetView) targetView.classList.add('active');
-      const navMap = { 'view-generate': 0, 'view-studio': 1, 'view-gallery': 2, 'view-recharge': 3, 'view-contact': 4 };
+      
+      const navMap = { 
+        'view-generate': 0, 
+        'view-community': 1, 
+        'view-challenges': 2, 
+        'view-tutorials': 3, 
+        'view-studio': 4, 
+        'view-gallery': 5, 
+        'view-recharge': 6, 
+        'view-contact': 7 
+      };
       if (navMap[viewId] !== undefined) { 
         const navItems = document.querySelectorAll('.nav-item');
         if (navItems[navMap[viewId]]) navItems[navMap[viewId]].classList.add('active'); 
+
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        if (sidebarItems[navMap[viewId]]) sidebarItems[navMap[viewId]].classList.add('active');
       }
+      
       if (viewId === 'view-gallery') renderGallery();
+      if (viewId === 'view-community') renderCommunityFeed();
     }
 
     function switchStudioTab(tabName) {
@@ -759,363 +956,441 @@
       }
     }
 
-    // --- PHOTO STUDIO LOGIC ---
- async function processPhotoTool() {
-  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-  if (credits < 1) { 
-    showToast("Crédits épuisés."); 
-    switchView('view-recharge'); 
-    return; 
-  }
-  if (!currentPhotoFile) { 
-    showToast("Veuillez d'abord charger une photo."); 
-    return; 
-  }
+    // --- FEATURE 1: DAILY CHECK-IN LOGIC ---
+    function initDailyCheckinUI() {
+      const streak = parseInt(localStorage.getItem('byaoia_streak') || '0');
+      const daysContainer = document.getElementById('streak-days-container');
+      if (!daysContainer) return;
 
-  const loadModal = document.getElementById('loading-modal');
-  if (loadModal) loadModal.style.display = "flex";
-  document.getElementById('loader-subtitle').innerText = "Traitement photo en cours...";
-
-  try {
-    // 1. Charger l'image source dans un objet Image JavaScript
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(currentPhotoFile);
-    
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = objectUrl;
-    });
-
-    // 2. Créer un Canvas pour manipuler l'image
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    let sourceWidth = img.width;
-    let sourceHeight = img.height;
-    let targetWidth = sourceWidth;
-    let targetHeight = sourceHeight;
-    let startX = 0;
-    let startY = 0;
-
-    // 3. Appliquer le traitement selon l'outil actif (activePhotoTool)
-    if (activePhotoTool === 'crop') {
-      const ratioSelect = document.getElementById('crop-ratio');
-      const ratioVal = ratioSelect ? ratioSelect.value : '1:1';
-      
-      if (ratioVal === '1:1') {
-        targetWidth = Math.min(sourceWidth, sourceHeight);
-        targetHeight = targetWidth;
-        startX = (sourceWidth - targetWidth) / 2;
-        startY = (sourceHeight - targetHeight) / 2;
-      } else if (ratioVal === '16:9') {
-        if (sourceWidth / sourceHeight > 16/9) {
-          targetHeight = sourceHeight;
-          targetWidth = sourceHeight * (16/9);
-          startX = (sourceWidth - targetWidth) / 2;
-        } else {
-          targetWidth = sourceWidth;
-          targetHeight = sourceWidth * (9/16);
-          startY = (sourceHeight - targetHeight) / 2;
-        }
-      } else if (ratioVal === '9:16') {
-        if (sourceWidth / sourceHeight > 9/16) {
-          targetHeight = sourceHeight;
-          targetWidth = sourceHeight * (9/16);
-          startX = (sourceWidth - targetWidth) / 2;
-        } else {
-          targetWidth = sourceWidth;
-          targetHeight = sourceWidth * (16/9);
-          startY = (sourceHeight - targetHeight) / 2;
-        }
+      let html = '';
+      for (let i = 1; i <= 7; i++) {
+        let className = 'streak-day';
+        if (i < streak) className += ' completed';
+        else if (i === streak) className += ' active';
+        html += `<div class="${className}">${i}</div>`;
       }
+      daysContainer.innerHTML = html;
+    }
+
+    function claimDailyReward() {
+      const lastClaimDate = localStorage.getItem('byaoia_last_claim');
+      const today = new Date().toDateString();
+
+      if (lastClaimDate === today) {
+        showToast("Umeshachukua zawadi yako ya leo! Rudi kesho.");
+        return;
+      }
+
+      let streak = parseInt(localStorage.getItem('byaoia_streak') || '0') + 1;
+      if (streak > 7) streak = 1;
       
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      ctx.drawImage(img, startX, startY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
+      localStorage.setItem('byaoia_streak', streak);
+      localStorage.setItem('byaoia_last_claim', today);
 
-    } else {
-      // Pour les filtres et le texte, on conserve les dimensions originales
-      canvas.width = sourceWidth;
-      canvas.height = sourceHeight;
-      ctx.drawImage(img, 0, 0);
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || '0') + streak;
+      localStorage.setItem('byaoia_credits', credits);
+      initUserCredits();
+      initDailyCheckinUI();
 
-      if (activePhotoTool === 'filter') {
-        const filterType = document.getElementById('filter-type')?.value;
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imgData.data;
+      showToast(`🎉 Hongera! Umepata mikopo +${streak} ya leo!`);
+    }
 
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
+    // --- FEATURE 2: COMMUNITY FEED LOGIC ---
+    function renderCommunityFeed() {
+      const container = document.getElementById('community-feed-container');
+      if (!container) return;
 
-          if (filterType === 'grayscale') {
-            const avg = 0.3 * r + 0.59 * g + 0.11 * b;
-            data[i] = avg;
-            data[i + 1] = avg;
-            data[i + 2] = avg;
-          } else if (filterType === 'sepia') {
-            data[i]     = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
-            data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
-            data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
-          } else if (filterType === 'invert') {
-            data[i]     = 255 - r;
-            data[i + 1] = 255 - g;
-            data[i + 2] = 255 - b;
+      let posts = JSON.parse(localStorage.getItem('byaoia_community_posts')) || [
+        { id: 1, author: 'Amani Rocky', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500', prompt: 'Cyberpunk city lights in 8k', likes: 24, liked: false },
+        { id: 2, author: 'Jean Bosco', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=500', prompt: 'Oil painting abstract art', likes: 18, liked: false }
+      ];
+
+      container.innerHTML = posts.map(post => `
+        <div class="community-post">
+          <div class="community-header">
+            <span>👤 ${post.author}</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">${post.prompt}</span>
+          </div>
+          <img src="${post.url}" class="community-img" alt="Community creation">
+          <div class="community-footer">
+            <button class="like-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+              ❤️ <span>${post.likes}</span>
+            </button>
+            <span style="font-size: 0.75rem; color: var(--success);">ByaoIA Pro</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleLike(postId) {
+      let posts = JSON.parse(localStorage.getItem('byaoia_community_posts')) || [
+        { id: 1, author: 'Amani Rocky', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500', prompt: 'Cyberpunk city lights in 8k', likes: 24, liked: false },
+        { id: 2, author: 'Jean Bosco', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=500', prompt: 'Oil painting abstract art', likes: 18, liked: false }
+      ];
+
+      posts = posts.map(p => {
+        if (p.id === postId) {
+          p.liked = !p.liked;
+          p.likes += p.liked ? 1 : -1;
+        }
+        return p;
+      });
+
+      localStorage.setItem('byaoia_community_posts', JSON.stringify(posts));
+      renderCommunityFeed();
+    }
+
+    function publishToCommunity() {
+      if (!currentGeneratedImageUrl) {
+        showToast("Tengeneza picha kwanza kwenye IA Image kabla ya kuchapisha!");
+        switchView('view-generate');
+        return;
+      }
+
+      let posts = JSON.parse(localStorage.getItem('byaoia_community_posts')) || [];
+      posts.unshift({
+        id: Date.now(),
+        author: localStorage.getItem('byaoia_user_name') || 'Mtumiaji',
+        url: currentGeneratedImageUrl,
+        prompt: 'Kazi mpya ya ubunifu',
+        likes: 1,
+        liked: true
+      });
+
+      localStorage.setItem('byaoia_community_posts', JSON.stringify(posts));
+      showToast("Kazi yako imechapishwa kwenye Ukuta wa Jamii!");
+      switchView('view-community');
+    }
+
+    function joinCurrentChallenge() {
+      showToast("Umejiunga na changamoto! Tuma picha yako kwenye Community Feed.");
+      switchView('view-generate');
+    }
+
+    function openTutorial(type) {
+      if (type === 'logo') {
+        showToast("Mafunzo: Chagua mtindo wa 'Logo Design' na uandike jina la kampuni yako.");
+      } else if (type === 'cyberpunk') {
+        showToast("Mafunzo: Tumia neno 'Cyberpunk neon lights, futuristic city' kwenye prompt.");
+      } else {
+        showToast("Mafunzo: Tumia Video Studio kukata au kubadilisha kasi ya video zako urahisi.");
+      }
+    }
+
+    // --- PHOTO STUDIO LOGIC ---
+    async function processPhotoTool() {
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+      if (credits < 1) { 
+        showToast("Crédits épuisés."); 
+        switchView('view-recharge'); 
+        return; 
+      }
+      if (!currentPhotoFile) { 
+        showToast("Veuillez d'abord charger une photo."); 
+        return; 
+      }
+
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "flex";
+      document.getElementById('loader-subtitle').innerText = "Traitement photo en cours...";
+
+      try {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(currentPhotoFile);
+        
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = objectUrl;
+        });
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let sourceWidth = img.width;
+        let sourceHeight = img.height;
+        let targetWidth = sourceWidth;
+        let targetHeight = sourceHeight;
+        let startX = 0;
+        let startY = 0;
+
+        if (activePhotoTool === 'crop') {
+          const ratioSelect = document.getElementById('crop-ratio');
+          const ratioVal = ratioSelect ? ratioSelect.value : '1:1';
+          
+          if (ratioVal === '1:1') {
+            targetWidth = Math.min(sourceWidth, sourceHeight);
+            targetHeight = targetWidth;
+            startX = (sourceWidth - targetWidth) / 2;
+            startY = (sourceHeight - targetHeight) / 2;
+          } else if (ratioVal === '16:9') {
+            if (sourceWidth / sourceHeight > 16/9) {
+              targetHeight = sourceHeight;
+              targetWidth = sourceHeight * (16/9);
+              startX = (sourceWidth - targetWidth) / 2;
+            } else {
+              targetWidth = sourceWidth;
+              targetHeight = sourceWidth * (9/16);
+              startY = (sourceHeight - targetHeight) / 2;
+            }
+          } else if (ratioVal === '9:16') {
+            if (sourceWidth / sourceHeight > 9/16) {
+              targetHeight = sourceHeight;
+              targetWidth = sourceHeight * (9/16);
+              startX = (sourceWidth - targetWidth) / 2;
+            } else {
+              targetWidth = sourceWidth;
+              targetHeight = sourceWidth * (16/9);
+              startY = (sourceHeight - targetHeight) / 2;
+            }
+          }
+          
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          ctx.drawImage(img, startX, startY, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
+
+        } else {
+          canvas.width = sourceWidth;
+          canvas.height = sourceHeight;
+          ctx.drawImage(img, 0, 0);
+
+          if (activePhotoTool === 'filter') {
+            const filterType = document.getElementById('filter-type')?.value;
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              const r = data[i];
+              const g = data[i + 1];
+              const b = data[i + 2];
+
+              if (filterType === 'grayscale') {
+                const avg = 0.3 * r + 0.59 * g + 0.11 * b;
+                data[i] = avg;
+                data[i + 1] = avg;
+                data[i + 2] = avg;
+              } else if (filterType === 'sepia') {
+                data[i]     = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+              } else if (filterType === 'invert') {
+                data[i]     = 255 - r;
+                data[i + 1] = 255 - g;
+                data[i + 2] = 255 - b;
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+          } else if (activePhotoTool === 'watermark' || activePhotoTool === 'textonimage') {
+            const textInput = document.getElementById('photo-extra-text');
+            const customText = textInput && textInput.value.trim() !== '' ? textInput.value : 'BYAO Studio';
+            
+            ctx.font = `bold ${Math.max(24, Math.floor(canvas.width / 25))}px sans-serif`;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.lineWidth = 4;
+            
+            const metrics = ctx.measureText(customText);
+            const x = canvas.width - metrics.width - 40;
+            const y = canvas.height - 40;
+            
+            ctx.strokeText(customText, x, y);
+            ctx.fillText(customText, x, y);
           }
         }
-        ctx.putImageData(imgData, 0, 0);
 
-      } else if (activePhotoTool === 'watermark' || activePhotoTool === 'textonimage') {
-        const textInput = document.getElementById('photo-extra-text');
-        const customText = textInput && textInput.value.trim() !== '' ? textInput.value : 'BYAO Studio';
+        const processedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        document.getElementById('photo-preview-box').innerHTML = `<img src="${processedDataUrl}" alt="Aperçu photo traité">`;
+
+        credits -= 1;
+        localStorage.setItem('byaoia_credits', credits);
+        document.getElementById('user-credits').innerText = credits;
         
-        // Configuration du style du texte incrusté
-        ctx.font = `bold ${Math.max(24, Math.floor(canvas.width / 25))}px sans-serif`;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.lineWidth = 4;
+        if (loadModal) loadModal.style.display = "none";
         
-        const metrics = ctx.measureText(customText);
-        const x = canvas.width - metrics.width - 40;
-        const y = canvas.height - 40;
-        
-        ctx.strokeText(customText, x, y);
-        ctx.fillText(customText, x, y);
+        showInterstitialAd(() => {
+          showToast("✨ Photo traitée avec succès !");
+          saveToGallery('Photo Studio: ' + activePhotoTool, processedDataUrl);
+        });
+
+        URL.revokeObjectURL(objectUrl);
+
+      } catch (error) {
+        console.error("Erreur lors du traitement photo :", error);
+        if (loadModal) loadModal.style.display = "none";
+        showToast("Une erreur est survenue lors du traitement de la photo.");
       }
     }
 
-    // 4. Générer l'URL de l'image modifiée et mettre à jour l'aperçu
-    const processedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-    document.getElementById('photo-preview-box').innerHTML = `<img src="${processedDataUrl}" alt="Aperçu photo traité">`;
+    let ffmpegInstance = null;
 
-    // 5. Gestion des crédits et de l'interface
-    credits -= 1;
-    localStorage.setItem('byaoia_credits', credits);
-    document.getElementById('user-credits').innerText = credits;
-    
-    if (loadModal) loadModal.style.display = "none";
-    
-    // 6. Publicité et enregistrement final
-    showInterstitialAd(() => {
-      showToast("✨ Photo traitée avec succès !");
-      saveToGallery('Photo Studio: ' + activePhotoTool, processedDataUrl);
-    });
-
-    URL.revokeObjectURL(objectUrl);
-
-  } catch (error) {
-    console.error("Erreur lors du traitement photo :", error);
-    if (loadModal) loadModal.style.display = "none";
-    showToast("Une erreur est survenue lors du traitement de la photo.");
-  }
-}
-
-// Instance globale de FFmpeg (chargée paresseusement pour optimiser les performances)
-let ffmpegInstance = null;
-
-async function getFFmpeg() {
-  if (ffmpegInstance) return ffmpegInstance;
-  
-  const { FFmpeg } = FFmpegWASM;
-  const ffmpeg = new FFmpeg();
-  
-  const { fetchFile } = FFmpegUtil;
-  
-  // Chargement des cores de FFmpeg depuis le CDN officiel
-  const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-  });
-  
-  ffmpegInstance = { ffmpeg, fetchFile };
-  return ffmpegInstance;
-}
-
-async function processVideoTool() {
-  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-  if (credits < 1) { 
-    showToast("Crédits épuisés."); 
-    switchView('view-recharge'); 
-    return; 
-  }
-  if (!currentVideoFile) { 
-    showToast("Veuillez d'abord charger une vidéo."); 
-    return; 
-  }
-
-  const loadModal = document.getElementById('loading-modal');
-  if (loadModal) loadModal.style.display = "flex";
-  
-  const subtitleElem = document.getElementById('loader-subtitle');
-  if (subtitleElem) subtitleElem.innerText = "Initialisation du moteur vidéo...";
-
-  try {
-    // 1. Charger le moteur FFmpeg WebAssembly
-    const { ffmpeg, fetchFile } = await getFFmpeg();
-    
-    if (subtitleElem) subtitleElem.innerText = "Traitement et encodage en cours...";
-
-    // 2. Écrire le fichier source dans le système de fichiers virtuel de FFmpeg
-    const inputFileName = 'input.mp4';
-    const outputFileName = 'output.mp4';
-    
-    await ffmpeg.writeFile(inputFileName, await fetchFile(currentVideoFile));
-
-    // 3. Appliquer le traitement réel en fonction de l'outil actif (activeVideoTool)
-    // Vous pouvez adapter ces commandes selon vos besoins précis (ex: compression, extraction audio, filtre N&B, etc.)
-    let ffmpegArgs = [];
-    switch (activeVideoTool) {
-      case 'compress':
-        // Compression / Réduction du bitrate
-        ffmpegArgs = ['-i', inputFileName, '-vcodec', 'libx264', '-crf', '28', outputFileName];
-        break;
-      case 'grayscale':
-        // Filtre noir et blanc
-        ffmpegArgs = ['-i', inputFileName, '-vf', 'colorchannelmixer=.3:.4:.3:0:.3:.4:.3:0:.3:.4:.3', outputFileName];
-        break;
-      case 'extract-audio':
-        // Extraction de la piste audio (conversion en MP3)
-        // Note: adapter l'extension de sortie si besoin (.mp3)
-        break;
-      default:
-        // Action par défaut : ré-encodage standard propre
-        ffmpegArgs = ['-i', inputFileName, '-c:v', 'libx264', '-preset', 'fast', outputFileName];
-        break;
+    async function getFFmpeg() {
+      if (ffmpegInstance) return ffmpegInstance;
+      
+      const { FFmpeg } = FFmpegWASM;
+      const ffmpeg = new FFmpeg();
+      const { fetchFile } = FFmpegUtil;
+      
+      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+      await ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      });
+      
+      ffmpegInstance = { ffmpeg, fetchFile };
+      return ffmpegInstance;
     }
 
-    // Exécution de la commande FFmpeg
-    await ffmpeg.exec(ffmpegArgs);
-
-    // 4. Récupération du fichier traité
-    const data = await ffmpeg.readFile(outputFileName);
-    const processedBlob = new Blob([data.buffer], { type: 'video/mp4' });
-    const processedUrl = URL.createObjectURL(processedBlob);
-
-    // Mettre à jour l'aperçu avec la vidéo traitée
-    document.getElementById('video-preview-box').innerHTML = `<video controls src="${processedUrl}"></video>`;
-
-    // 5. Déduction des crédits
-    credits -= 1;
-    localStorage.setItem('byaoia_credits', credits);
-    document.getElementById('user-credits').innerText = credits;
-    
-    if (loadModal) loadModal.style.display = "none";
-    
-    // 6. Affichage de la publicité après la génération réussie
-    showInterstitialAd(() => {
-      showToast("🎬 Vidéo traitée avec succès !");
-      saveToGallery('Vidéo Studio: ' + activeVideoTool, processedUrl);
-    });
-
-  } catch (error) {
-    console.error("Erreur lors du traitement vidéo :", error);
-    if (loadModal) loadModal.style.display = "none";
-    showToast("Une erreur est survenue lors du traitement de la vidéo.");
-  }
-}
-
-
-    // --- DOC STUDIO LOGIC ---
-async function processDocTool() {
-  let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
-  if (credits < 1) { 
-    showToast("Crédits épuisés."); 
-    switchView('view-recharge'); 
-    return; 
-  }
-
-  const docTextElement = document.getElementById('doc-input-text');
-  const docText = docTextElement ? docTextElement.value.trim() : "";
-  
-  if (!docText && activeDocTool === 'noteseditor') { 
-    showToast("Veuillez saisir du texte."); 
-    return; 
-  }
-
-  const loadModal = document.getElementById('loading-modal');
-  if (loadModal) loadModal.style.display = "flex";
-  
-  const subtitleElem = document.getElementById('loader-subtitle');
-  if (subtitleElem) subtitleElem.innerText = "Compilation et mise en page du document...";
-
-  try {
-    let generatedBlob = null;
-    let fileName = "document_byaoia.pdf";
-
-    // Traitement réel selon l'outil sélectionné
-    if (activeDocTool === 'noteseditor' || activeDocTool === 'pdfexport') {
-      // Génération d'un fichier PDF propre avec jsPDF
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      // Paramètres de mise en page
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      
-      // En-tête du document généré
-      doc.setTextColor(40, 40, 40);
-      doc.text("BYAO Studio - Document Officiel", 20, 20);
-      doc.setLineWidth(0.5);
-      doc.line(20, 25, 190, 25);
-
-      // Corps du texte saisi par l'utilisateur (avec gestion du retour à la ligne automatique)
-      const splitText = doc.splitTextToSize(docText || "Aucun contenu fourni.", 170);
-      doc.text(splitText, 20, 35);
-
-      // Pied de page
-      doc.setFontSize(10);
-      doc.setTextColor(150, 150, 150);
-      doc.text("Généré par BYAOIA Studio", 20, 285);
-
-      // Sortie sous forme de Blob PDF
-      generatedBlob = doc.output('blob');
-      fileName = `note_${Date.now()}.pdf`;
-
-    } else {
-      // Export texte brut (TXT) par défaut ou autre format
-      generatedBlob = new Blob([docText], { type: 'text/plain;charset=utf-8' });
-      fileName = `document_${Date.now()}.txt`;
-    }
-
-    // Création d'une URL de téléchargement locale
-    const downloadUrl = URL.createObjectURL(generatedBlob);
-
-    // Mettre à jour les crédits
-    credits -= 1;
-    localStorage.setItem('byaoia_credits', credits);
-    document.getElementById('user-credits').innerText = credits;
-    
-    if (loadModal) loadModal.style.display = "none";
-    
-    // Affichage de la publicité après la génération réussie
-    showInterstitialAd(() => {
-      showToast("📄 Document généré avec succès !");
-      
-      // Déclenchement automatique du téléchargement du fichier
-      const downloadLink = document.createElement('a');
-      downloadLink.href = downloadUrl;
-      downloadLink.download = fileName;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-
-      // Sauvegarde optionnelle dans la galerie/historique si la fonction existe
-      if (typeof saveToGallery === 'function') {
-        saveToGallery('Doc Studio: ' + activeDocTool, downloadUrl);
+    async function processVideoTool() {
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+      if (credits < 1) { 
+        showToast("Crédits épuisés."); 
+        switchView('view-recharge'); 
+        return; 
       }
-    });
+      if (!currentVideoFile) { 
+        showToast("Veuillez d'abord charger une vidéo."); 
+        return; 
+      }
 
-  } catch (error) {
-    console.error("Erreur lors de la compilation du document :", error);
-    if (loadModal) loadModal.style.display = "none";
-    showToast("Une erreur est survenue lors de la génération du document.");
-  }
-}
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "flex";
+      
+      const subtitleElem = document.getElementById('loader-subtitle');
+      if (subtitleElem) subtitleElem.innerText = "Initialisation du moteur vidéo...";
 
-    // --- REWARDED ADS LOGIC ---
+      try {
+        const { ffmpeg, fetchFile } = await getFFmpeg();
+        
+        if (subtitleElem) subtitleElem.innerText = "Traitement et encodage en cours...";
+
+        const inputFileName = 'input.mp4';
+        const outputFileName = 'output.mp4';
+        
+        await ffmpeg.writeFile(inputFileName, await fetchFile(currentVideoFile));
+
+        let ffmpegArgs = [];
+        switch (activeVideoTool) {
+          case 'compress':
+            ffmpegArgs = ['-i', inputFileName, '-vcodec', 'libx264', '-crf', '28', outputFileName];
+            break;
+          case 'grayscale':
+            ffmpegArgs = ['-i', inputFileName, '-vf', 'colorchannelmixer=.3:.4:.3:0:.3:.4:.3:0:.3:.4:.3', outputFileName];
+            break;
+          default:
+            ffmpegArgs = ['-i', inputFileName, '-c:v', 'libx264', '-preset', 'fast', outputFileName];
+            break;
+        }
+
+        await ffmpeg.exec(ffmpegArgs);
+
+        const data = await ffmpeg.readFile(outputFileName);
+        const processedBlob = new Blob([data.buffer], { type: 'video/mp4' });
+        const processedUrl = URL.createObjectURL(processedBlob);
+
+        document.getElementById('video-preview-box').innerHTML = `<video controls src="${processedUrl}"></video>`;
+
+        credits -= 1;
+        localStorage.setItem('byaoia_credits', credits);
+        document.getElementById('user-credits').innerText = credits;
+        
+        if (loadModal) loadModal.style.display = "none";
+        
+        showInterstitialAd(() => {
+          showToast("🎬 Vidéo traitée avec succès !");
+          saveToGallery('Vidéo Studio: ' + activeVideoTool, processedUrl);
+        });
+
+      } catch (error) {
+        console.error("Erreur lors du traitement vidéo :", error);
+        if (loadModal) loadModal.style.display = "none";
+        showToast("Une erreur est survenue lors du traitement de la vidéo.");
+      }
+    }
+
+    async function processDocTool() {
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+      if (credits < 1) { 
+        showToast("Crédits épuisés."); 
+        switchView('view-recharge'); 
+        return; 
+      }
+
+      const docTextElement = document.getElementById('doc-input-text');
+      const docText = docTextElement ? docTextElement.value.trim() : "";
+      
+      if (!docText && activeDocTool === 'noteseditor') { 
+        showToast("Veuillez saisir du texte."); 
+        return; 
+      }
+
+      const loadModal = document.getElementById('loading-modal');
+      if (loadModal) loadModal.style.display = "flex";
+      
+      const subtitleElem = document.getElementById('loader-subtitle');
+      if (subtitleElem) subtitleElem.innerText = "Compilation et mise en page du document...";
+
+      try {
+        let generatedBlob = null;
+        let fileName = "document_byaoia.pdf";
+
+        if (activeDocTool === 'noteseditor' || activeDocTool === 'pdfexport') {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          
+          doc.setTextColor(40, 40, 40);
+          doc.text("BYAO Studio - Document Officiel", 20, 20);
+          doc.setLineWidth(0.5);
+          doc.line(20, 25, 190, 25);
+
+          const splitText = doc.splitTextToSize(docText || "Aucun contenu fourni.", 170);
+          doc.text(splitText, 20, 35);
+
+          doc.setFontSize(10);
+          doc.setTextColor(150, 150, 150);
+          doc.text("Généré par BYAOIA Studio", 20, 285);
+
+          generatedBlob = doc.output('blob');
+          fileName = `note_${Date.now()}.pdf`;
+
+        } else {
+          generatedBlob = new Blob([docText], { type: 'text/plain;charset=utf-8' });
+          fileName = `document_${Date.now()}.txt`;
+        }
+
+        const downloadUrl = URL.createObjectURL(generatedBlob);
+
+        credits -= 1;
+        localStorage.setItem('byaoia_credits', credits);
+        document.getElementById('user-credits').innerText = credits;
+        
+        if (loadModal) loadModal.style.display = "none";
+        
+        showInterstitialAd(() => {
+          showToast("📄 Document généré avec succès !");
+          
+          const downloadLink = document.createElement('a');
+          downloadLink.href = downloadUrl;
+          downloadLink.download = fileName;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+
+          if (typeof saveToGallery === 'function') {
+            saveToGallery('Doc Studio: ' + activeDocTool, downloadUrl);
+          }
+        });
+
+      } catch (error) {
+        console.error("Erreur lors de la compilation du document :", error);
+        if (loadModal) loadModal.style.display = "none";
+        showToast("Une erreur est survenue lors de la génération du document.");
+      }
+    }
+
     function watchAdForCredits() {
       const loaderSub = document.getElementById('loader-subtitle');
       if (loaderSub) loaderSub.innerText = "Chargement de la publicité...";
@@ -1146,7 +1421,6 @@ async function processDocTool() {
       showToast("🎉 Félicitations ! +2 Crédits ajoutés.");
     }
 
-    // --- IMAGE GENERATION LOGIC ---
     async function generateImage() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       const promptInput = document.getElementById('prompt-input');
@@ -1193,7 +1467,6 @@ async function processDocTool() {
           saveToGallery(promptText, imageUrl);
           if (promptInput) promptInput.value = "";
 
-          // Affichage de la publicité interstitielle immédiatement après la génération d'image
           showInterstitialAd(() => {
             showToast("Image générée avec succès !");
           });
@@ -1276,126 +1549,117 @@ async function processDocTool() {
       navigator.clipboard.writeText(text);
       showToast(`Copié : ${text}`);
     }
-// --- SÉLECTION DES OUTILS (GLOBAL SCOPE FIX) ---
 
-function selectPhotoTool(toolId, title, desc) {
-  window.activePhotoTool = toolId;
-  
-  const workspace = document.getElementById('photo-workspace');
-  if (workspace) workspace.style.display = 'block';
-  
-  const titleElem = document.getElementById('photo-ws-title');
-  if (titleElem) titleElem.innerText = title;
-  
-  const descElem = document.getElementById('photo-ws-desc');
-  if (descElem) descElem.innerText = desc;
-  
-  const controls = document.getElementById('photo-controls');
-  if (controls) {
-    if (toolId === 'crop') {
-      controls.innerHTML = `<select id="crop-ratio"><option value="1:1">Carré (1:1)</option><option value="16:9">Paysage (16:9)</option><option value="9:16">Story (9:16)</option></select>`;
-    } else if (toolId === 'filter') {
-      controls.innerHTML = `<select id="filter-type"><option value="grayscale">Noir & Blanc</option><option value="sepia">Sépia Rétro</option><option value="invert">Négatif</option></select>`;
-    } else if (toolId === 'watermark' || toolId === 'textonimage') {
-      controls.innerHTML = `<input type="text" id="photo-extra-text" placeholder="Texte du filigrane ou message">`;
-    } else {
-      controls.innerHTML = ``;
+    function selectPhotoTool(toolId, title, desc) {
+      window.activePhotoTool = toolId;
+      
+      const workspace = document.getElementById('photo-workspace');
+      if (workspace) workspace.style.display = 'block';
+      
+      const titleElem = document.getElementById('photo-ws-title');
+      if (titleElem) titleElem.innerText = title;
+      
+      const descElem = document.getElementById('photo-ws-desc');
+      if (descElem) descElem.innerText = desc;
+      
+      const controls = document.getElementById('photo-controls');
+      if (controls) {
+        if (toolId === 'crop') {
+          controls.innerHTML = `<select id="crop-ratio"><option value="1:1">Carré (1:1)</option><option value="16:9">Paysage (16:9)</option><option value="9:16">Story (9:16)</option></select>`;
+        } else if (toolId === 'filter') {
+          controls.innerHTML = `<select id="filter-type"><option value="grayscale">Noir & Blanc</option><option value="sepia">Sépia Rétro</option><option value="invert">Négatif</option></select>`;
+        } else if (toolId === 'watermark' || toolId === 'textonimage') {
+          controls.innerHTML = `<input type="text" id="photo-extra-text" placeholder="Texte du filigrane ou message">`;
+        } else {
+          controls.innerHTML = ``;
+        }
+      }
     }
-  }
-}
 
-function selectVideoTool(toolId, title, desc) {
-  window.activeVideoTool = toolId;
-  
-  const workspace = document.getElementById('video-workspace');
-  if (workspace) workspace.style.display = 'block';
-  
-  const titleElem = document.getElementById('video-ws-title');
-  if (titleElem) titleElem.innerText = title;
-  
-  const descElem = document.getElementById('video-ws-desc');
-  if (descElem) descElem.innerText = desc;
-}
-
-function selectDocTool(toolId, title, desc) {
-  window.activeDocTool = toolId;
-  
-  const workspace = document.getElementById('doc-workspace');
-  if (workspace) workspace.style.display = 'block';
-  
-  const titleElem = document.getElementById('doc-ws-title');
-  if (titleElem) titleElem.innerText = title;
-  
-  const descElem = document.getElementById('doc-ws-desc');
-  if (descElem) descElem.innerText = desc;
-}
-
-// ⚠️ TRÈS IMPORTANT : Force l'exposition globale des fonctions 
-// si votre script est chargé en tant que module ES6 (<script type="module">)
-window.selectPhotoTool = selectPhotoTool;
-window.selectVideoTool = selectVideoTool;
-window.selectDocTool = selectDocTool;
-let currentPhotoFile = null;
-let currentVideoFile = null;
-let currentDocFile = null;
-
-// Prévisualisation Photo
-function previewPhotoFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  currentPhotoFile = file;
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const previewBox = document.getElementById('photo-preview-box');
-    if (previewBox) {
-      previewBox.innerHTML = `<img src="${e.target.result}" alt="Aperçu photo" style="max-width:100%; max-height:220px; border-radius:8px; object-fit:contain;">`;
+    function selectVideoTool(toolId, title, desc) {
+      window.activeVideoTool = toolId;
+      
+      const workspace = document.getElementById('video-workspace');
+      if (workspace) workspace.style.display = 'block';
+      
+      const titleElem = document.getElementById('video-ws-title');
+      if (titleElem) titleElem.innerText = title;
+      
+      const descElem = document.getElementById('video-ws-desc');
+      if (descElem) descElem.innerText = desc;
     }
-  };
-  reader.readAsDataURL(file);
-}
 
-// Prévisualisation Vidéo
-function previewVideoFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  currentVideoFile = file;
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const previewBox = document.getElementById('video-preview-box');
-    if (previewBox) {
-      previewBox.innerHTML = `<video controls src="${e.target.result}" style="max-width:100%; max-height:220px; border-radius:8px;"></video>`;
+    function selectDocTool(toolId, title, desc) {
+      window.activeDocTool = toolId;
+      
+      const workspace = document.getElementById('doc-workspace');
+      if (workspace) workspace.style.display = 'block';
+      
+      const titleElem = document.getElementById('doc-ws-title');
+      if (titleElem) titleElem.innerText = title;
+      
+      const descElem = document.getElementById('doc-ws-desc');
+      if (descElem) descElem.innerText = desc;
     }
-  };
-  reader.readAsDataURL(file);
-}
 
-// Exposition globale pour éviter les erreurs ReferenceError
-window.previewPhotoFile = previewPhotoFile;
-window.previewVideoFile = previewVideoFile;
-function previewDocFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  currentDocFile = file;
+    window.selectPhotoTool = selectPhotoTool;
+    window.selectVideoTool = selectVideoTool;
+    window.selectDocTool = selectDocTool;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const textArea = document.getElementById('doc-input-text');
-    if (textArea) {
-      // Remplit automatiquement le champ de texte avec le contenu du fichier chargé
-      textArea.value = e.target.result;
+    let currentPhotoFile = null;
+    let currentVideoFile = null;
+    let currentDocFile = null;
+
+    function previewPhotoFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      currentPhotoFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewBox = document.getElementById('photo-preview-box');
+        if (previewBox) {
+          previewBox.innerHTML = `<img src="${e.target.result}" alt="Aperçu photo" style="max-width:100%; max-height:220px; border-radius:8px; object-fit:contain;">`;
+        }
+      };
+      reader.readAsDataURL(file);
     }
-    showToast(`📁 Fichier chargé : ${file.name}`);
-  };
-  
-  // Lecture du fichier en tant que texte (compatible .txt, .md, .html)
-  reader.readAsText(file);
-}
 
-// Exposition globale
-window.previewDocFile = previewDocFile;
+    function previewVideoFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      currentVideoFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewBox = document.getElementById('video-preview-box');
+        if (previewBox) {
+          previewBox.innerHTML = `<video controls src="${e.target.result}" style="max-width:100%; max-height:220px; border-radius:8px;"></video>`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
 
+    window.previewPhotoFile = previewPhotoFile;
+    window.previewVideoFile = previewVideoFile;
+
+    function previewDocFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      currentDocFile = file;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const textArea = document.getElementById('doc-input-text');
+        if (textArea) {
+          textArea.value = e.target.result;
+        }
+        showToast(`📁 Fichier chargé : ${file.name}`);
+      };
+      reader.readAsText(file);
+    }
+
+    window.previewDocFile = previewDocFile;
   </script>
 </body>
 </html>
