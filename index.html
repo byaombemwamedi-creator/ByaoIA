@@ -268,500 +268,502 @@
   </style>
 </head>
 <body>
-  
 <div id="app-loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.5s ease;">
   <div style="border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
   <p style="margin-top: 15px; font-family: sans-serif; color: #555; font-size: 14px;">Recharge ByaoIA Studio...</p>
 </div>
 
-  <div class="app-screen">
+<div class="app-screen">
 
-    <!-- Toast Notification Boreshwa -->
-    <div id="toast-notification">
-      <span>💬</span> <span id="toast-text">Notification</span>
-    </div>
-
-    <!-- SIDEBAR KUSHOTO NA OVERLAY -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
-    <div class="left-sidebar" id="left-sidebar">
-      <div class="sidebar-header">
-        <div class="logo-container">
-          <div class="logo-badge" style="font-size: 1.1rem;">ByaoIA Pro</div>
-        </div>
-        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
-      </div>
-      <div class="sidebar-menu-list">
-        <button class="sidebar-item active" onclick="switchView('view-generate'); toggleSidebar();"><span class="sidebar-icon">✨</span> IA Image</button>
-        <button class="sidebar-item" onclick="switchView('view-community'); toggleSidebar();"><span class="sidebar-icon">🌍</span> Partager</button>
-        <button class="sidebar-item" onclick="switchView('view-challenges'); toggleSidebar();"><span class="sidebar-icon">🏆</span> Challenge</button>
-        <button class="sidebar-item" onclick="switchView('view-tutorials'); toggleSidebar();"><span class="sidebar-icon">💡</span> instructions</button>
-        <button class="sidebar-item" onclick="switchView('view-studio'); toggleSidebar();"><span class="sidebar-icon">🎬</span> Studio</button>
-        <button class="sidebar-item" onclick="switchView('view-gallery'); toggleSidebar();"><span class="sidebar-icon">🖼️</span> Galerie</button>
-        <button class="sidebar-item" onclick="switchView('view-recharge'); toggleSidebar();"><span class="sidebar-icon">⚡</span> Recharge</button>
-        <button class="sidebar-item" onclick="switchView('view-contact'); toggleSidebar();"><span class="sidebar-icon">🌐</span> Contacts & Support</button>
-      </div>
-    </div>
-
-    <div id="view-auth" class="view">
-      <div class="auth-container">
-        <svg class="auth-logo" viewBox="0 0 512 512">
-          <defs>
-            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#8b5cf6" />
-              <stop offset="50%" stop-color="#d946ef" />
-              <stop offset="100%" stop-color="#ec4899" />
-            </linearGradient>
-          </defs>
-          <rect width="512" height="512" rx="115" fill="#0f172a"/>
-          <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#bgGrad)" stroke-width="6" opacity="0.4"/>
-          <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z M220 170 V230 H255 C275 230 290 220 290 200 C290 180 275 170 255 170 H220 Z M220 280 V350 H265 C288 350 302 338 302 315 C302 292 288 280 265 280 H220 Z" fill="url(#bgGrad)"/>
-          <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ffffff"/>
-        </svg>
-
-        <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Studio Pro</h1>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Votre Suite de Montage Multimédia & Documents Hors-Ligne.</p>
-        
-        <input type="email" id="auth-email" placeholder="Votre adresse email">
-        <input type="text" id="auth-name" placeholder="Votre nom complet">
-        <button class="btn" onclick="loginWithEmail()">Se connecter / S'inscrire</button>
-      </div>
-    </div>
-
-    <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
-      <div class="app-header">
-        <div class="logo-container">
-          <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-          <svg class="header-logo" viewBox="0 0 512 512">
-            <rect width="512" height="512" rx="115" fill="#0f172a"/>
-            <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z" fill="#8b5cf6"/>
-            <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ec4899"/>
-          </svg>
-          <div class="logo-badge">ByaoIA</div>
-        </div>
-        <div class="credit-badge" onclick="switchView('view-recharge')">
-          ⚡ <span id="user-credits">10</span> Crédits
-        </div>
-      </div>
-    </div>
-
-    <div id="view-generate" class="view">
-      <!-- Feature 1: Daily Check-in & Streaks -->
-      <div class="daily-checkin-banner">
-        <div>
-          <p style="font-weight: bold; font-size: 0.9rem; color: #c084fc;">📅 Récompense Quotidienne</p>
-          <p style="font-size: 0.75rem; color: var(--text-muted);" id="streak-status-text">Récupérez vos crédits du jour !</p>
-          <div class="streak-days" id="streak-days-container">
-            <div class="streak-day">1</div>
-            <div class="streak-day">2</div>
-            <div class="streak-day">3</div>
-            <div class="streak-day">4</div>
-            <div class="streak-day">5</div>
-            <div class="streak-day">6</div>
-            <div class="streak-day">7</div>
-          </div>
-        </div>
-        <button class="btn" style="width: auto; padding: 10px 14px; font-size: 0.8rem;" onclick="claimDailyReward()">🎁 Réclamer</button>
-      </div>
-
-      <div id="generator-form-section">
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale (IA Générative) :</p>
-        <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
-
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Choisir un style :</p>
-        <div class="style-selector">
-          <div class="style-option active" onclick="setStyle(this, 'Photoréaliste')">📸 Réaliste</div>
-          <div class="style-option" onclick="setStyle(this, '3D Render')">🎨 3D Render</div>
-          <div class="style-option" onclick="setStyle(this, 'Anime')">⛩️ Anime</div>
-          <div class="style-option" onclick="setStyle(this, 'Cyberpunk')">🏙️ Cyberpunk</div>
-          <div class="style-option" onclick="setStyle(this, 'Peinture')">🖌️ Peinture</div>
-          <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏️️ Logo</div>
-        </div>
-
-        <button class="btn" onclick="generateImage()">✨ Générer l'Image (1 Crédit)</button>
-      </div>
-
-      <div style="margin-top: 20px;">
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Résultat :</p>
-        <div class="result-container" id="result-box">
-          <p id="placeholder-text" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">
-            L'image générée s'affichera ici.
-          </p>
-        </div>
-        <button id="download-btn" class="btn btn-secondary" style="display:none; margin-bottom: 14px;" onclick="downloadCurrentImage()">📥 Télécharger l'Image</button>
-      </div>
-
-      <div class="rewarded-ad-box">
-        <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
-        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub</button>
-      </div>
-    </div>
-
-    <!-- Feature 2: Community Feed / "Explore" -->
-    <div id="view-community" class="view">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <h3 style="font-size: 1.1rem;">🌍 Communauté (Explore)</h3>
-        <button class="btn" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="publishToCommunity()">+ Publier</button>
-      </div>
-      <div id="community-feed-container">
-        <!-- Dynamically filled community posts -->
-      </div>
-    </div>
-
-    <!-- Feature 3: Weekly Creative Challenges -->
-    <div id="view-challenges" class="view">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">🏆 Challenges de Créativité de chaque semaine </h3>
-      
-      <div class="challenge-card">
-        <p style="font-weight: bold; font-size: 1rem; color: var(--accent); margin-bottom: 4px;">✨ Paysage Cyberpunk le Plus beau</p>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Créer une image plus belle de Cyberpunk puis l'envoyer sur le challenge et gagner plus de 5 Crédits!</p>
-        <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="joinCurrentChallenge()">Participer au  Challenge</button>
-      </div>
-
-      <h4 style="font-size: 0.95rem; margin: 16px 0 8px 0;">🏅 La liste de Gagnants  (Leaderboard)</h4>
-      <div style="background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 12px;">
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem;">
-          <span>🥇 1. Dorthea Byaombe</span>
-          <span style="color: var(--success); font-weight: bold;">450 Likes</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem;">
-          <span>🥈 2.David alembe</span>
-          <span style="color: var(--success); font-weight: bold;">380 Likes</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.85rem;">
-          <span>🥉 3. Trifaina Ubato.</span>
-          <span style="color: var(--success); font-weight: bold;">310 Likes</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Feature 4: Mini Tutorials / "Tips & Tricks" -->
-    <div id="view-tutorials" class="view">
-      <h3 style="margin-bottom: 14px; font-size: 1.1rem;">💡 les modalités & les instructions</h3>
-      
-      <div class="tutorial-card" onclick="openTutorial('logo')">
-        <div class="tutorial-icon">✏️</div>
-        <div>
-          <p style="font-weight: bold; font-size: 0.9rem;">Façon de Créer Une  meilleure logo en 30</p>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">Jifunze kutumia mtindo wa Logo Design kwa ufanisi mkubwa.</p>
-        </div>
-      </div>
-
-      <div class="tutorial-card" onclick="openTutorial('cyberpunk')">
-        <div class="tutorial-icon">🏙️</div>
-        <div>
-          <p style="font-weight: bold; font-size: 0.9rem;">Siri ya mandhari ya Cyberpunk yenye mvuto</p>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">Maneno sahihi (prompts) ya kuandika ili kupata matokeo mazuri.</p>
-        </div>
-      </div>
-
-      <div class="tutorial-card" onclick="openTutorial('video')">
-        <div class="tutorial-icon">🎬</div>
-        <div>
-          <p style="font-weight: bold; font-size: 0.9rem;">Mbinu za kufanya video zako zivutie zaidi</p>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">Vidokezo vya utumiaji wa Video Studio bila kukwama.</p>
-        </div>
-      </div>
-    </div>
-
-    <div id="view-studio" class="view">
-      <div class="studio-header">
-        <button class="studio-tab-btn active" onclick="switchStudioTab('photo')">📸 Photo Studio</button>
-        <button class="studio-tab-btn" onclick="switchStudioTab('video')">🎬 Vidéo Studio</button>
-        <button class="studio-tab-btn" onclick="switchStudioTab('docs')">📄 Doc Studio</button>
-      </div>
-
-      <div id="studio-photo" class="studio-section active">
-        <div class="feature-grid">
-          <div class="feature-card" onclick="selectPhotoTool('crop', '✂️ Recadrer & Redimensionner', 'Sélectionnez une image et définissez les dimensions souhaitées.')">
-            <div class="feature-icon">✂️️</div>
-            <div class="feature-title">1. Recadrer & Redim.</div>
-            <div class="feature-desc">Ajustez la taille et format</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('filter', '🎨 Filtres & Effets Pro', 'Appliquez des filtres instantanés (N&B, Sépia, Vintage, Cyber).')">
-            <div class="feature-icon">🎨</div>
-            <div class="feature-title">2. Filtres & Effets</div>
-            <div class="feature-desc">Styles artistiques hors-ligne</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('bgremove', '🪄 Détourage & Masque', 'Supprimez l\'arrière-plan de façon intelligente.')">
-            <div class="feature-icon">🪄</div>
-            <div class="feature-title">3. Détourage Express</div>
-            <div class="feature-desc">Isolation de sujet</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('watermark', '💧 Filigrane & Signature', 'Ajoutez un logo ou texte de protection sur l\'image.')">
-            <div class="feature-icon">💧</div>
-            <div class="feature-title">4. Filigrane / Watermark</div>
-            <div class="feature-desc">Protégez vos créations</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('textonimage', '✍️ Texte & Autocollants', 'Insérez des polices personnalisées et stickers.')">
-            <div class="feature-icon">✍️</div>
-            <div class="feature-title">5. Texte sur Image</div>
-            <div class="feature-desc">Typographie créative</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('adjust', '🎛️ Luminosité & Contraste', 'Réglez exposition, saturation, teintes et ombres.')">
-            <div class="feature-icon">🎛️</div>
-            <div class="feature-title">6. Color Grading</div>
-            <div class="feature-desc">Ajustement colorimétrique</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('collage', '🖼 Collage & Grille', 'Assemblez plusieurs photos en une seule composition.')">
-            <div class="feature-icon">🖼️</div>
-            <div class="feature-title">7. Collage & Grille</div>
-            <div class="feature-desc">Multipages & cadres</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('blur', '🌫️ Flou & Effet Bokeh', 'Créez un flou artistique d\'arrière-plan.')">
-            <div class="feature-icon">🌫️</div>
-            <div class="feature-title">8. Flou & Bokeh</div>
-            <div class="feature-desc">Profondeur de champ</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('compress', '📦 Compression & Export', 'Réduisez la taille en Ko/Mo sans perte visible.')">
-            <div class="feature-icon">📦</div>
-            <div class="feature-title">9. Compression Web</div>
-            <div class="feature-desc">Optimisation rapide</div>
-          </div>
-          <div class="feature-card" onclick="selectPhotoTool('convert', '🔄 Convertisseur Formats', 'Convertissez entre PNG, JPG, WEBP et BMP.')">
-            <div class="feature-icon">🔄</div>
-            <div class="feature-title">10. Conversion Formats</div>
-            <div class="feature-desc">PNG, JPG, WEBP</div>
-          </div>
-        </div>
-
-        <div class="workspace-box" id="photo-workspace" style="display:none;">
-          <div class="workspace-title" id="photo-ws-title">🛠️ Espace de Travail Photo</div>
-          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="photo-ws-desc">Sélectionnez une image :</p>
-          <input type="file" id="photo-file-input" accept="image/*" onchange="previewPhotoFile(event)">
-          <div class="result-container" id="photo-preview-box">
-            <p style="color:var(--text-muted); font-size:0.85rem;">Aucune image chargée.</p>
-          </div>
-          <div id="photo-controls" style="margin-top:10px;"></div>
-          <button class="btn" style="margin-top:10px;" onclick="processPhotoTool()">🚀 Appliquer l'effet (1 Crédit)</button>
-        </div>
-      </div>
-
-      <div id="studio-video" class="studio-section">
-        <div class="feature-grid">
-          <div class="feature-card" onclick="selectVideoTool('trim', '✂️ Couper & Découper', 'Extrayez les meilleurs moments d\'une séquence vidéo.')">
-            <div class="feature-icon">✂️</div>
-            <div class="feature-title">1. Couper / Trimmer</div>
-            <div class="feature-desc">Extraction de clips</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('merge', '🔗 Fusionner des Vidéos', 'Assemblez plusieurs clips en une seule vidéo fluide.')">
-            <div class="feature-icon">🔗</div>
-            <div class="feature-title">2. Fusion de Clips</div>
-            <div class="feature-desc">Assemblage séquentiel</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('audio', '🎵 Extraire & Mute Audio', 'Ajoutez une piste musicale ou supprimez le son.')">
-            <div class="feature-icon">🎵</div>
-            <div class="feature-title">3. Studio Audio / Mute</div>
-            <div class="feature-desc">Gestion pistes sonores</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('speed', '⏩ Ralenti & Accéléré', 'Modifiez la vitesse de lecture (0.5x à 4x).')">
-            <div class="feature-icon">⏩</div>
-            <div class="feature-title">4. Vitesse / Time-lapse</div>
-            <div class="feature-desc">Ralenti & Accélération</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('gif', '🎞️ Convertisseur GIF Animé', 'Transformez un extrait vidéo en GIF partageable.')">
-            <div class="feature-icon">🎞️</div>
-            <div class="feature-title">5. Export GIF Animé</div>
-            <div class="feature-desc">Boucles courtes</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('resize', '📐 Redimensionner & Crop', 'Adaptez la vidéo pour TikTok, Reels ou YouTube.')">
-            <div class="feature-icon">📐</div>
-            <div class="feature-title">6. Format & Recadrage</div>
-            <div class="feature-desc">9:16, 1:1, 16:9</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('subtitle', '💬 Incrustation Sous-titres', 'Ajoutez des fichiers SRT ou texte incrusté.')">
-            <div class="feature-icon">💬</div>
-            <div class="feature-title">7. Sous-titrage texte</div>
-            <div class="feature-desc">Incrustation dynamique</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('filter', '✨ Filtres Cinématographiques', 'Appliquez des ambiances colorées pro (Cinematic).')">
-            <div class="feature-icon">✨</div>
-            <div class="feature-title">8. Filtres Vidéo Pro</div>
-            <div class="feature-desc">Rendu cinéma</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('compress', '📦 Compression Vidéo', 'Compressez la taille du fichier MP4 / WebM.')">
-            <div class="feature-icon">📦</div>
-            <div class="feature-title">9. Compresseur Vidéo</div>
-            <div class="feature-desc">Allègement de poids</div>
-          </div>
-          <div class="feature-card" onclick="selectVideoTool('snapshot', '📸 Extraction de Frames', 'Capturez des images haute définition d\'une vidéo.')">
-            <div class="feature-icon">📸</div>
-            <div class="feature-title">10. Capture d'image</div>
-            <div class="feature-desc">Extraction de frames</div>
-          </div>
-        </div>
-
-        <div class="workspace-box" id="video-workspace" style="display:none;">
-          <div class="workspace-title" id="video-ws-title">🎬 Espace de Travail Vidéo</div>
-          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="video-ws-desc">Sélectionnez une vidéo :</p>
-          <input type="file" id="video-file-input" accept="video/*" onchange="previewVideoFile(event)">
-          <div class="result-container" id="video-preview-box">
-            <p style="color:var(--text-muted); font-size:0.85rem;">Aucune vidéo chargée.</p>
-          </div>
-          <button class="btn" style="margin-top:10px;" onclick="processVideoTool()">🚀 Traiter la Vidéo (1 Crédit)</button>
-        </div>
-      </div>
-
-      <div id="studio-docs" class="studio-section">
-        <div class="feature-grid">
-          <div class="feature-card" onclick="selectDocTool('pdfmerge', '📂 Fusionner des PDF', 'Regroupez plusieurs documents PDF en un seul fichier.')">
-            <div class="feature-icon">📂</div>
-            <div class="feature-title">1. Fusion de PDF</div>
-            <div class="feature-desc">Assemblage de documents</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('pdfsplit', '✂ Diviser un PDF', 'Séparez un grand document en plusieurs fichiers.')">
-            <div class="feature-icon">✂️</div>
-            <div class="feature-title">2. Division de PDF</div>
-            <div class="feature-desc">Extraction de pages</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('wordtopdf', '🔄 Convertisseur Docs', 'Convertissez texte/Markdown/HTML en PDF soigné.')">
-            <div class="feature-icon">🔄</div>
-            <div class="feature-title">3. Convertisseur PDF</div>
-            <div class="feature-desc">TXT/HTML vers PDF</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('watermarkpdf', '💧 Filigrane Document', 'Apposez un tampon ou filigrane confidentiel.')">
-            <div class="feature-icon">💧</div>
-            <div class="feature-title">4. Tampon / Filigrane PDF</div>
-            <div class="feature-desc">Sécurisation de notes</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('compresspdf', '📦 Compression PDF', 'Optimisez et réduisez le poids des fichiers lourds.')">
-            <div class="feature-icon">📦</div>
-            <div class="feature-title">5. Compression PDF</div>
-            <div class="feature-desc">Allègement de taille</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('signpdf', '✍️ Signature Électronique', 'Ajoutez une signature visuelle sur vos contrats.')">
-            <div class="feature-icon">✍️</div>
-            <div class="feature-title">6. Signature Doc</div>
-            <div class="feature-desc">Validation rapide</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('noteseditor', '📝 Éditeur Markdown/TXT', 'Rédigez, mettez en forme et exportez vos notes.')">
-            <div class="feature-icon">📝</div>
-            <div class="feature-title">7. Éditeur de Notes Pro</div>
-            <div class="feature-desc">Rédaction & export</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('tablemaker', '📊 Générateur de Tableaux', 'Créez des tableaux CSV et tableaux de bord.')">
-            <div class="feature-icon">📊</div>
-            <div class="feature-title">8. Tableaux & CSV</div>
-            <div class="feature-desc">Gestion de données</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('ocrscan', '🔍 Scanner & Extraction Texte', 'Extrayez le texte brut d\'une image de document.')">
-            <div class="feature-icon">🔍</div>
-            <div class="feature-title">9. OCR & Texte Image</div>
-            <div class="feature-desc">Reconnaissance de caractères</div>
-          </div>
-          <div class="feature-card" onclick="selectDocTool('securepdf', '🔒 Sécurité & Chiffrement', 'Protégez vos documents sensibles par mot de passe.')">
-            <div class="feature-icon">🔒</div>
-            <div class="feature-title">10. Chiffrement de Note</div>
-            <div class="feature-desc">Protection par code</div>
-          </div>
-        </div>
-
-        <div class="workspace-box" id="doc-workspace" style="display:none;">
-          <div class="workspace-title" id="doc-ws-title">📄 Espace de Travail Documents</div>
-          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="doc-ws-desc">Saisissez ou chargez vos données :</p>
-          <div class="doc-tool-box">
-            <!-- Sélecteur de fichier document -->
-            <input type="file" id="doc-file-input" accept=".txt,.md,.html,.json" onchange="previewDocFile(event)" style="margin-bottom: 10px;">
-            <!-- Zone de texte ou aperçu -->
-            <textarea id="doc-input-text" placeholder="Entrez votre texte ou chargez un fichier ci-dessus..."></textarea>
-          </div>
-          <button class="btn" style="margin-top:10px;" onclick="processDocTool()">🚀 Exécuter l'action (1 Crédit)</button>
-        </div>
-      </div>
-    </div>
-
-
-    <div id="view-gallery" class="view">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3 style="font-size: 1.1rem;">Mes Créations Studio</h3>
-        <button onclick="clearGallery()" style="background: none; border: none; color: var(--accent); font-size: 0.75rem; cursor: pointer;">Effacer l'historique</button>
-      </div>
-      <div class="gallery-grid" id="gallery-container"></div>
-    </div>
-
-    <div id="view-recharge" class="view">
-      <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits & Monétisation</h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Choisissez votre formule économique :</p>
-
-      <div class="pricing-card">
-        <div>
-          <p style="font-weight: bold; font-size: 0.9rem;">Pack Starter</p>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">20 Crédits</p>
-        </div>
-        <p style="font-weight: bold; color: var(--success);">5000 FC / 6000 FBu</p>
-      </div>
-
-      <div class="pricing-card featured">
-        <div>
-          <p style="font-weight: bold; font-size: 0.9rem;">Pack Pro (Populaire)</p>
-          <p style="font-size: 0.75rem; color: var(--text-muted);">60 Crédits + Support Prioritaire</p>
-        </div>
-        <p style="font-weight: bold; color: var(--success);">10 000 FC / 12 000 FBu</p>
-      </div>
-
-      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 12px 0 6px 0;">Effectuez le paiement via :</p>
-
-      <div class="payment-box">
-        <div>
-          <span>🔴 M-Pesa (RDC)</span>
-          <p>+243839406922</p>
-        </div>
-        <button class="copy-btn" onclick="copyText('+243839406922')">Copier</button>
-      </div>
-
-      <div class="payment-box">
-        <div>
-          <span>🟢 Lumicash (Burundi)</span>
-          <p>+25767843604</p>
-        </div>
-        <button class="copy-btn" onclick="copyText('+25767843604')">Copier</button>
-      </div>
-
-      <a href="https://wa.me/25767843604?text=Bonjour,%20je%20viens%20d'effectuer%20un%20paiement%20pour%20recharger%20mes%20cr%C3%A9dits%20ByaoStudio." target="_blank" class="btn" style="background: #16a34a; text-decoration:none; text-align:center; display:block; margin-top: 10px;">
-        💬 Valider la recharge via WhatsApp
-      </a>
-    </div>
-
-    <div id="view-contact" class="view">
-      <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Communauté & Support</h3>
-      <div class="social-links">
-        <a href="https://wa.me/25767843604" target="_blank" class="social-btn" style="background: #25D366;">💬 WhatsApp Business</a>
-        <a href="https://wa.me/243815680775" target="_blank" class="social-btn" style="background: #128C7E;">💬 WhatsApp Client</a>
-        <a href="https://www.facebook.com/profile.php?id=61577345702022&mibextid=ZbWKwL" target="_blank" class="social-btn" style="background: #1877F2;">📘 Page Facebook</a>
-        <a href="https://www.tiktok.com/@byaotechrockyn" target="_blank" class="social-btn" style="background: #000; border: 1px solid #334155;">🎵 TikTok</a>
-      </div>
-      <div style="margin-top: 25px; text-align: center;">
-        <button onclick="logoutUser()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 10px 20px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">Se déconnecter</button>
-      </div>
-    </div>
-
-    <div class="bottom-nav" id="bottom-navigation" style="display: none;">
-      <div class="nav-item active" onclick="switchView('view-generate')"><span class="nav-icon">✨</span>IA Image</div>
-
-      <div class="nav-item" onclick="switchView('view-studio')"><span class="nav-icon">🎬</span>Studio</div>
-      <div class="nav-item" onclick="switchView('view-gallery')"><span class="nav-icon">🖼️</span>Galerie</div>
-      <div class="nav-item" onclick="switchView('view-recharge')"><span class="nav-icon">⚡</span>Recharge</div>
-
-    <div id="interstitial-ad-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
-      <div style="background: var(--card-bg); border: 1px solid var(--primary); border-radius: 16px; width: 100%; max-width: 360px; padding: 20px; text-align: center; position: relative;">
-        <div style="position: absolute; top: 10px; right: 12px; font-size: 0.75rem; color: var(--text-muted); background: #334155; padding: 4px 8px; border-radius: 6px;">Annonce (Star.io / Unity Ads)</div>
-        <div style="margin: 25px 0 15px 0; background: #0f172a; border-radius: 10px; padding: 30px 10px; border: 1px dashed #475569;">
-          <p style="font-size: 1.1rem; font-weight: bold; color: var(--accent); margin-bottom: 6px;">⚡ Sponsorisé par ByaoTech</p>
-          <p style="font-size: 0.8rem; color: var(--text-muted);">Découvrez l'outil idéal pour vos créations numériques.</p>
-        </div>
-        <button id="close-ad-btn" class="btn" style="background: #334155; opacity: 0.6; cursor: not-allowed;" disabled onclick="closeInterstitialAd()">Fermer (5s)</button>
-      </div>
-    </div>
-
-    <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100; flex-direction:column;">
-      <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
-        <div class="spinner"></div>
-        <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Traitement...</h3>
-        <p style="font-size: 0.75rem; color: var(--text-muted);" id="loader-subtitle">Le studio traite votre fichier...</p>
-      </div>
-    </div>
-
+  <!-- Toast Notification Boreshwa -->
+  <div id="toast-notification">
+    <span>💬</span> <span id="toast-text">Notification</span>
   </div>
+
+  <!-- SIDEBAR KUSHOTO NA OVERLAY -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+  <div class="left-sidebar" id="left-sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-badge" style="font-size: 1.1rem;">ByaoIA Pro</div>
+      </div>
+      <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+    </div>
+    <div class="sidebar-menu-list">
+      <button class="sidebar-item active" onclick="switchView('view-generate'); toggleSidebar();"><span class="sidebar-icon">✨</span> IA Image</button>
+      <button class="sidebar-item" onclick="switchView('view-community'); toggleSidebar();"><span class="sidebar-icon">🌍</span> Partager</button>
+      <button class="sidebar-item" onclick="switchView('view-challenges'); toggleSidebar();"><span class="sidebar-icon">🏆</span> Challenge</button>
+      <button class="sidebar-item" onclick="switchView('view-tutorials'); toggleSidebar();"><span class="sidebar-icon">💡</span> instructions</button>
+      <button class="sidebar-item" onclick="switchView('view-studio'); toggleSidebar();"><span class="sidebar-icon">🎬</span> Studio</button>
+      <button class="sidebar-item" onclick="switchView('view-gallery'); toggleSidebar();"><span class="sidebar-icon">🖼️</span> Galerie</button>
+      <button class="sidebar-item" onclick="switchView('view-recharge'); toggleSidebar();"><span class="sidebar-icon">⚡</span> Recharge</button>
+      <button class="sidebar-item" onclick="switchView('view-contact'); toggleSidebar();"><span class="sidebar-icon">🌐</span> Contacts & Support</button>
+    </div>
+  </div>
+
+  <div id="view-auth" class="view">
+    <div class="auth-container">
+      <svg class="auth-logo" viewBox="0 0 512 512">
+        <defs>
+          <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8b5cf6" />
+            <stop offset="50%" stop-color="#d946ef" />
+            <stop offset="100%" stop-color="#ec4899" />
+          </linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="115" fill="#0f172a"/>
+        <rect x="8" y="8" width="496" height="496" rx="107" fill="none" stroke="url(#bgGrad)" stroke-width="6" opacity="0.4"/>
+        <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z M220 170 V230 H255 C275 230 290 220 290 200 C290 180 275 170 255 170 H220 Z M220 280 V350 H265 C288 350 302 338 302 315 C302 292 288 280 265 280 H220 Z" fill="url(#bgGrad)"/>
+        <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ffffff"/>
+      </svg>
+
+      <h1 style="font-size: 1.5rem; margin-bottom: 6px;">ByaoIA Studio Pro</h1>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Votre Suite de Montage Multimédia & Documents Hors-Ligne.</p>
+      
+      <input type="email" id="auth-email" placeholder="Votre adresse email">
+      <input type="text" id="auth-name" placeholder="Votre nom complet">
+      <button class="btn" onclick="loginWithEmail()">Se connecter / S'inscrire</button>
+    </div>
+  </div>
+
+  <div id="main-header" style="padding: 16px 18px 0 18px; display: none;">
+    <div class="app-header">
+      <div class="logo-container">
+        <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+        <svg class="header-logo" viewBox="0 0 512 512">
+          <rect width="512" height="512" rx="115" fill="#0f172a"/>
+          <path d="M160 120 H260 C310 120 340 145 340 185 C340 215 320 235 290 245 C330 255 355 280 355 325 C355 370 320 400 260 400 H160 V120 Z" fill="#8b5cf6"/>
+          <path d="M380 120 C380 145 395 160 420 160 C395 160 380 175 380 200 C380 175 365 160 340 160 C365 160 380 145 380 120 Z" fill="#ec4899"/>
+        </svg>
+        <div class="logo-badge">ByaoIA</div>
+      </div>
+      <div class="credit-badge" onclick="switchView('view-recharge')">
+        ⚡ <span id="user-credits">10</span> Crédits
+      </div>
+    </div>
+  </div>
+
+  <div id="view-generate" class="view">
+    <!-- Feature 1: Daily Check-in & Streaks -->
+    <div class="daily-checkin-banner">
+      <div>
+        <p style="font-weight: bold; font-size: 0.9rem; color: #c084fc;">📅 Récompense Quotidienne</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);" id="streak-status-text">Récupérez vos crédits du jour !</p>
+        <div class="streak-days" id="streak-days-container">
+          <div class="streak-day">1</div>
+          <div class="streak-day">2</div>
+          <div class="streak-day">3</div>
+          <div class="streak-day">4</div>
+          <div class="streak-day">5</div>
+          <div class="streak-day">6</div>
+          <div class="streak-day">7</div>
+        </div>
+      </div>
+      <button class="btn" style="width: auto; padding: 10px 14px; font-size: 0.8rem;" onclick="claimDailyReward()">🎁 Réclamer</button>
+    </div>
+
+    <div id="generator-form-section">
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Décrivez votre image idéale (IA Générative) :</p>
+      <textarea id="prompt-input" placeholder="Ex: Un magnifique paysage futuriste avec des rivières de lumière, style 8k..."></textarea>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Choisir un style :</p>
+      <div class="style-selector">
+        <div class="style-option active" onclick="setStyle(this, 'Photoréaliste')">📸 Réaliste</div>
+        <div class="style-option" onclick="setStyle(this, '3D Render')">🎨 3D Render</div>
+        <div class="style-option" onclick="setStyle(this, 'Anime')">⛩️ Anime</div>
+        <div class="style-option" onclick="setStyle(this, 'Cyberpunk')">🏙️ Cyberpunk</div>
+        <div class="style-option" onclick="setStyle(this, 'Peinture')">🖌️ Peinture</div>
+        <div class="style-option" onclick="setStyle(this, 'Logo Design')">✏ Logo</div>
+      </div>
+
+      <button class="btn" onclick="generateImage()">✨ Générer l'Image (1 Crédit)</button>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Résultat :</p>
+      <div class="result-container" id="result-box">
+        <p id="placeholder-text" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">
+          L'image générée s'affichera ici.
+        </p>
+      </div>
+      <button id="download-btn" class="btn btn-secondary" style="display:none; margin-bottom: 14px;" onclick="downloadCurrentImage()">📥 Télécharger l'Image</button>
+    </div>
+
+    <div class="rewarded-ad-box">
+      <p style="font-size: 0.85rem; font-weight: bold; color: #c084fc; margin-bottom: 4px;">🎁 Gagner des Crédits Gratuits</p>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Regardez une courte vidéo publicitaire pour recevoir +2 crédits gratuits.</p>
+      <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="watchAdForCredits()">📺 Regarder une pub</button>
+    </div>
+  </div>
+
+  <!-- Feature 2: Community Feed / "Explore" -->
+  <div id="view-community" class="view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <h3 style="font-size: 1.1rem;">🌍 Communauté (Explore)</h3>
+      <button class="btn" style="width: auto; padding: 6px 12px; font-size: 0.75rem;" onclick="publishToCommunity()">+ Publier</button>
+    </div>
+    <div id="community-feed-container">
+      <!-- Dynamically filled community posts -->
+    </div>
+  </div>
+
+  <!-- Feature 3: Weekly Creative Challenges -->
+  <div id="view-challenges" class="view">
+    <h3 style="margin-bottom: 12px; font-size: 1.1rem;">🏆 Challenges de Créativité de chaque semaine </h3>
+    
+    <div class="challenge-card">
+      <p style="font-weight: bold; font-size: 1rem; color: var(--accent); margin-bottom: 4px;">✨ Paysage Cyberpunk le Plus beau</p>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px;">Créer une image plus belle de Cyberpunk puis l'envoyer sur le challenge et gagner plus de 5 Crédits!</p>
+      <button class="btn" style="padding: 10px; font-size: 0.85rem;" onclick="joinCurrentChallenge()">Participer au  Challenge</button>
+    </div>
+
+    <h4 style="font-size: 0.95rem; margin: 16px 0 8px 0;">🏅 La liste de Gagnants  (Leaderboard)</h4>
+    <div style="background: var(--card-bg); border: 1px solid #334155; border-radius: 12px; padding: 12px;">
+      <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem;">
+        <span>🥇 1. Dorthea Byaombe</span>
+        <span style="color: var(--success); font-weight: bold;">450 Likes</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; font-size: 0.85rem;">
+        <span>🥈 2.David alembe</span>
+        <span style="color: var(--success); font-weight: bold;">380 Likes</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.85rem;">
+        <span>🥉 3. Trifaina Ubato.</span>
+        <span style="color: var(--success); font-weight: bold;">310 Likes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 4: Mini Tutorials / "Tips & Tricks" -->
+  <div id="view-tutorials" class="view">
+    <h3 style="margin-bottom: 14px; font-size: 1.1rem;">💡 les modalités & les instructions</h3>
+    
+    <div class="tutorial-card" onclick="openTutorial('logo')">
+      <div class="tutorial-icon">✏️</div>
+      <div>
+        <p style="font-weight: bold; font-size: 0.9rem;">Façon de Créer Une  meilleure logo en 30</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">Jifunze kutumia mtindo wa Logo Design kwa ufanisi mkubwa.</p>
+      </div>
+    </div>
+
+    <div class="tutorial-card" onclick="openTutorial('cyberpunk')">
+      <div class="tutorial-icon">🏙️</div>
+      <div>
+        <p style="font-weight: bold; font-size: 0.9rem;">Siri ya mandhari ya Cyberpunk yenye mvuto</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">Maneno sahihi (prompts) ya kuandika ili kupata matokeo mazuri.</p>
+      </div>
+    </div>
+
+    <div class="tutorial-card" onclick="openTutorial('video')">
+      <div class="tutorial-icon">🎬</div>
+      <div>
+        <p style="font-weight: bold; font-size: 0.9rem;">Mbinu za kufanya video zako zivutie zaidi</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">Vidokezo vya utumiaji wa Video Studio bila kukwama.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-studio" class="view">
+    <div class="studio-header">
+      <button class="studio-tab-btn active" onclick="switchStudioTab('photo')">📸 Photo Studio</button>
+      <button class="studio-tab-btn" onclick="switchStudioTab('video')">🎬 Vidéo Studio</button>
+      <button class="studio-tab-btn" onclick="switchStudioTab('docs')">📄 Doc Studio</button>
+    </div>
+
+    <div id="studio-photo" class="studio-section active">
+      <div class="feature-grid">
+        <div class="feature-card" onclick="selectPhotoTool('crop', '✂️ Recadrer & Redimensionner', 'Sélectionnez une image et définissez les dimensions souhaitées.')">
+          <div class="feature-icon">✂</div>
+          <div class="feature-title">1. Recadrer & Redim.</div>
+          <div class="feature-desc">Ajustez la taille et format</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('filter', '🎨 Filtres & Effets Pro', 'Appliquez des filtres instantanés (N&B, Sépia, Vintage, Cyber).')">
+          <div class="feature-icon">🎨</div>
+          <div class="feature-title">2. Filtres & Effets</div>
+          <div class="feature-desc">Styles artistiques hors-ligne</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('bgremove', '🪄 Détourage & Masque', 'Supprimez l\'arrière-plan de façon intelligente.')">
+          <div class="feature-icon">🪄</div>
+          <div class="feature-title">3. Détourage Express</div>
+          <div class="feature-desc">Isolation de sujet</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('watermark', '💧 Filigrane & Signature', 'Ajoutez un logo ou texte de protection sur l\'image.')">
+          <div class="feature-icon">💧</div>
+          <div class="feature-title">4. Filigrane / Watermark</div>
+          <div class="feature-desc">Protégez vos créations</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('textonimage', '✍️ Texte & Autocollants', 'Insérez des polices personnalisées et stickers.')">
+          <div class="feature-icon">✍️</div>
+          <div class="feature-title">5. Texte sur Image</div>
+          <div class="feature-desc">Typographie créative</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('adjust', '🎛️ Luminosité & Contraste', 'Réglez exposition, saturation, teintes et ombres.')">
+          <div class="feature-icon">🎛️</div>
+          <div class="feature-title">6. Color Grading</div>
+          <div class="feature-desc">Ajustement colorimétrique</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('collage', '🖼 Collage & Grille', 'Assemblez plusieurs photos en une seule composition.')">
+          <div class="feature-icon">🖼️</div>
+          <div class="feature-title">7. Collage & Grille</div>
+          <div class="feature-desc">Multipages & cadres</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('blur', '🌫️ Flou & Effet Bokeh', 'Créez un flou artistique d\'arrière-plan.')">
+          <div class="feature-icon">🌫️</div>
+          <div class="feature-title">8. Flou & Bokeh</div>
+          <div class="feature-desc">Profondeur de champ</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('compress', '📦 Compression & Export', 'Réduisez la taille en Ko/Mo sans perte visible.')">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">9. Compression Web</div>
+          <div class="feature-desc">Optimisation rapide</div>
+        </div>
+        <div class="feature-card" onclick="selectPhotoTool('convert', '🔄 Convertisseur Formats', 'Convertissez entre PNG, JPG, WEBP et BMP.')">
+          <div class="feature-icon">🔄</div>
+          <div class="feature-title">10. Conversion Formats</div>
+          <div class="feature-desc">PNG, JPG, WEBP</div>
+        </div>
+      </div>
+
+      <div class="workspace-box" id="photo-workspace" style="display:none;">
+        <div class="workspace-title" id="photo-ws-title">🛠️ Espace de Travail Photo</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="photo-ws-desc">Sélectionnez une image :</p>
+        <input type="file" id="photo-file-input" accept="image/*" onchange="previewPhotoFile(event)">
+        <div class="result-container" id="photo-preview-box">
+          <p style="color:var(--text-muted); font-size:0.85rem;">Aucune image chargée.</p>
+        </div>
+        <div id="photo-controls" style="margin-top:10px;"></div>
+        <button class="btn" style="margin-top:10px;" onclick="processPhotoTool()">🚀 Appliquer l'effet (1 Crédit)</button>
+      </div>
+    </div>
+
+    <div id="studio-video" class="studio-section">
+      <div class="feature-grid">
+        <div class="feature-card" onclick="selectVideoTool('trim', '✂️ Couper & Découper', 'Extrayez les meilleurs moments d\'une séquence vidéo.')">
+          <div class="feature-icon">✂️</div>
+          <div class="feature-title">1. Couper / Trimmer</div>
+          <div class="feature-desc">Extraction de clips</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('merge', '🔗 Fusionner des Vidéos', 'Assemblez plusieurs clips en une seule vidéo fluide.')">
+          <div class="feature-icon">🔗</div>
+          <div class="feature-title">2. Fusion de Clips</div>
+          <div class="feature-desc">Assemblage séquentiel</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('audio', '🎵 Extraire & Mute Audio', 'Ajoutez une piste musicale ou supprimez le son.')">
+          <div class="feature-icon">🎵</div>
+          <div class="feature-title">3. Studio Audio / Mute</div>
+          <div class="feature-desc">Gestion pistes sonores</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('speed', '⏩ Ralenti & Accéléré', 'Modifiez la vitesse de lecture (0.5x à 4x).')">
+          <div class="feature-icon">⏩</div>
+          <div class="feature-title">4. Vitesse / Time-lapse</div>
+          <div class="feature-desc">Ralenti & Accélération</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('gif', '🎞️ Convertisseur GIF Animé', 'Transformez un extrait vidéo en GIF partageable.')">
+          <div class="feature-icon">🎞️</div>
+          <div class="feature-title">5. Export GIF Animé</div>
+          <div class="feature-desc">Boucles courtes</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('resize', '📐 Redimensionner & Crop', 'Adaptez la vidéo pour TikTok, Reels ou YouTube.')">
+          <div class="feature-icon">📐</div>
+          <div class="feature-title">6. Format & Recadrage</div>
+          <div class="feature-desc">9:16, 1:1, 16:9</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('subtitle', '💬 Incrustation Sous-titres', 'Ajoutez des fichiers SRT ou texte incrusté.')">
+          <div class="feature-icon">💬</div>
+          <div class="feature-title">7. Sous-titrage texte</div>
+          <div class="feature-desc">Incrustation dynamique</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('filter', '✨ Filtres Cinématographiques', 'Appliquez des ambiances colorées pro (Cinematic).')">
+          <div class="feature-icon">✨</div>
+          <div class="feature-title">8. Filtres Vidéo Pro</div>
+          <div class="feature-desc">Rendu cinéma</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('compress', '📦 Compression Vidéo', 'Compressez la taille du fichier MP4 / WebM.')">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">9. Compresseur Vidéo</div>
+          <div class="feature-desc">Allègement de poids</div>
+        </div>
+        <div class="feature-card" onclick="selectVideoTool('snapshot', '📸 Extraction de Frames', 'Capturez des images haute définition d\'une vidéo.')">
+          <div class="feature-icon">📸</div>
+          <div class="feature-title">10. Capture d'image</div>
+          <div class="feature-desc">Extraction de frames</div>
+        </div>
+      </div>
+
+      <div class="workspace-box" id="video-workspace" style="display:none;">
+        <div class="workspace-title" id="video-ws-title">🎬 Espace de Travail Vidéo</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="video-ws-desc">Sélectionnez une vidéo :</p>
+        <input type="file" id="video-file-input" accept="video/*" onchange="previewVideoFile(event)">
+        <div class="result-container" id="video-preview-box">
+          <p style="color:var(--text-muted); font-size:0.85rem;">Aucune vidéo chargée.</p>
+        </div>
+        <button class="btn" style="margin-top:10px;" onclick="processVideoTool()">🚀 Traiter la Vidéo (1 Crédit)</button>
+      </div>
+    </div>
+
+    <div id="studio-docs" class="studio-section">
+      <div class="feature-grid">
+        <div class="feature-card" onclick="selectDocTool('pdfmerge', '📂 Fusionner des PDF', 'Regroupez plusieurs documents PDF en un seul fichier.')">
+          <div class="feature-icon">📂</div>
+          <div class="feature-title">1. Fusion de PDF</div>
+          <div class="feature-desc">Assemblage de documents</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('pdfsplit', '✂ Diviser un PDF', 'Séparez un grand document en plusieurs fichiers.')">
+          <div class="feature-icon">✂️</div>
+          <div class="feature-title">2. Division de PDF</div>
+          <div class="feature-desc">Extraction de pages</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('wordtopdf', '🔄 Convertisseur Docs', 'Convertissez texte/Markdown/HTML en PDF soigné.')">
+          <div class="feature-icon">🔄</div>
+          <div class="feature-title">3. Convertisseur PDF</div>
+          <div class="feature-desc">TXT/HTML vers PDF</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('watermarkpdf', '💧 Filigrane Document', 'Apposez un tampon ou filigrane confidentiel.')">
+          <div class="feature-icon">💧</div>
+          <div class="feature-title">4. Tampon / Filigrane PDF</div>
+          <div class="feature-desc">Sécurisation de notes</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('compresspdf', '📦 Compression PDF', 'Optimisez et réduisez le poids des fichiers lourds.')">
+          <div class="feature-icon">📦</div>
+          <div class="feature-title">5. Compression PDF</div>
+          <div class="feature-desc">Allègement de taille</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('signpdf', '✍️ Signature Électronique', 'Ajoutez une signature visuelle sur vos contrats.')">
+          <div class="feature-icon">✍️</div>
+          <div class="feature-title">6. Signature Doc</div>
+          <div class="feature-desc">Validation rapide</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('noteseditor', '📝 Éditeur Markdown/TXT', 'Rédigez, mettez en forme et exportez vos notes.')">
+          <div class="feature-icon">📝</div>
+          <div class="feature-title">7. Éditeur de Notes Pro</div>
+          <div class="feature-desc">Rédaction & export</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('tablemaker', '📊 Générateur de Tableaux', 'Créez des tableaux CSV et tableaux de bord.')">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">8. Tableaux & CSV</div>
+          <div class="feature-desc">Gestion de données</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('ocrscan', '🔍 Scanner & Extraction Texte', 'Extrayez le texte brut d\'une image de document.')">
+          <div class="feature-icon">🔍</div>
+          <div class="feature-title">9. OCR & Texte Image</div>
+          <div class="feature-desc">Reconnaissance de caractères</div>
+        </div>
+        <div class="feature-card" onclick="selectDocTool('securepdf', '🔒 Sécurité & Chiffrement', 'Protégez vos documents sensibles par mot de passe.')">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">10. Chiffrement de Note</div>
+          <div class="feature-desc">Protection par code</div>
+        </div>
+      </div>
+
+      <div class="workspace-box" id="doc-workspace" style="display:none;">
+        <div class="workspace-title" id="doc-ws-title">📄 Espace de Travail Documents</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;" id="doc-ws-desc">Saisissez ou chargez vos données :</p>
+        <div class="doc-tool-box">
+          <!-- Sélecteur de fichier document -->
+          <input type="file" id="doc-file-input" accept=".txt,.md,.html,.json" onchange="previewDocFile(event)" style="margin-bottom: 10px;">
+          <!-- Zone de texte ou aperçu -->
+          <textarea id="doc-input-text" placeholder="Entrez votre texte ou chargez un fichier ci-dessus..."></textarea>
+        </div>
+        <button class="btn" style="margin-top:10px;" onclick="processDocTool()">🚀 Exécuter l'action (1 Crédit)</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="view-gallery" class="view">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="font-size: 1.1rem;">Mes Créations Studio</h3>
+      <button onclick="clearGallery()" style="background: none; border: none; color: var(--accent); font-size: 0.75rem; cursor: pointer;">Effacer l'historique</button>
+    </div>
+    <div class="gallery-grid" id="gallery-container"></div>
+  </div>
+
+  <div id="view-recharge" class="view">
+    <h3 style="margin-bottom: 6px; font-size: 1.1rem; color: var(--success);">Recharge de Crédits & Monétisation</h3>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Choisissez votre formule économique :</p>
+
+    <div class="pricing-card">
+      <div>
+        <p style="font-weight: bold; font-size: 0.9rem;">Pack Starter</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">20 Crédits</p>
+      </div>
+      <p style="font-weight: bold; color: var(--success);">5000 FC / 6000 FBu</p>
+    </div>
+
+    <div class="pricing-card featured">
+      <div>
+        <p style="font-weight: bold; font-size: 0.9rem;">Pack Pro (Populaire)</p>
+        <p style="font-size: 0.75rem; color: var(--text-muted);">60 Crédits + Support Prioritaire</p>
+      </div>
+      <p style="font-weight: bold; color: var(--success);">10 000 FC / 12 000 FBu</p>
+    </div>
+
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin: 12px 0 6px 0;">Effectuez le paiement via :</p>
+
+    <div class="payment-box">
+      <div>
+        <span>🔴 M-Pesa (RDC)</span>
+        <p>+243839406922</p>
+      </div>
+      <button class="copy-btn" onclick="copyText('+243839406922')">Copier</button>
+    </div>
+
+    <div class="payment-box">
+      <div>
+        <span>🟢 Lumicash (Burundi)</span>
+        <p>+25767843604</p>
+      </div>
+      <button class="copy-btn" onclick="copyText('+25767843604')">Copier</button>
+    </div>
+
+    <a href="https://wa.me/25767843604?text=Bonjour,%20je%20viens%20d'effectuer%20un%20paiement%20pour%20recharger%20mes%20cr%C3%A9dits%20ByaoStudio." target="_blank" class="btn" style="background: #16a34a; text-decoration:none; text-align:center; display:block; margin-top: 10px;">
+      💬 Valider la recharge via WhatsApp
+    </a>
+  </div>
+
+  <div id="view-contact" class="view">
+    <h3 style="margin-bottom: 12px; font-size: 1.1rem;">Communauté & Support</h3>
+    <div class="social-links">
+      <a href="https://wa.me/25767843604" target="_blank" class="social-btn" style="background: #25D366;">💬 WhatsApp Business</a>
+      <a href="https://wa.me/243815680775" target="_blank" class="social-btn" style="background: #128C7E;">💬 WhatsApp Client</a>
+      <a href="https://www.facebook.com/profile.php?id=61577345702022&mibextid=ZbWKwL" target="_blank" class="social-btn" style="background: #1877F2;">📘 Page Facebook</a>
+      <a href="https://www.tiktok.com/@byaotechrockyn" target="_blank" class="social-btn" style="background: #000; border: 1px solid #334155;">🎵 TikTok</a>
+    </div>
+    <div style="margin-top: 25px; text-align: center;">
+      <button onclick="logoutUser()" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 10px 20px; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">Se déconnecter</button>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation imefungwa vizuri -->
+  <div class="bottom-nav" id="bottom-navigation" style="display: none;">
+    <div class="nav-item active" onclick="switchView('view-generate')"><span class="nav-icon">✨</span>IA Image</div>
+    <div class="nav-item" onclick="switchView('view-studio')"><span class="nav-icon">🎬</span>Studio</div>
+    <div class="nav-item" onclick="switchView('view-gallery')"><span class="nav-icon">🖼️</span>Galerie</div>
+    <div class="nav-item" onclick="switchView('view-recharge')"><span class="nav-icon">⚡</span>Recharge</div>
+  </div>
+
+  <!-- Modal ya Matangazo imefungwa vizuri -->
+  <div id="interstitial-ad-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
+    <div style="background: var(--card-bg); border: 1px solid var(--primary); border-radius: 16px; width: 100%; max-width: 360px; padding: 20px; text-align: center; position: relative;">
+      <div style="position: absolute; top: 10px; right: 12px; font-size: 0.75rem; color: var(--text-muted); background: #334155; padding: 4px 8px; border-radius: 6px;">Annonce (Star.io / Unity Ads)</div>
+      <div style="margin: 25px 0 15px 0; background: #0f172a; border-radius: 10px; padding: 30px 10px; border: 1px dashed #475569;">
+        <p style="font-size: 1.1rem; font-weight: bold; color: var(--accent); margin-bottom: 6px;">⚡ Sponsorisé par ByaoTech</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">Découvrez l'outil idéal pour vos créations numériques.</p>
+      </div>
+      <button id="close-ad-btn" class="btn" style="background: #334155; opacity: 0.6; cursor: not-allowed;" disabled onclick="closeInterstitialAd()">Fermer (5s)</button>
+    </div>
+  </div>
+
+  <!-- Loading Modal imefungwa vizuri -->
+  <div id="loading-modal" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); justify-content:center; align-items:center; z-index:100; flex-direction:column;">
+    <div style="background:#182232; border:1px solid #334155; border-radius:20px; padding:20px; width:80%; max-width:280px; text-align:center;">
+      <div class="spinner"></div>
+      <h3 style="color: var(--primary); margin-bottom: 6px; font-size: 1rem;">Traitement...</h3>
+      <p style="font-size: 0.75rem; color: var(--text-muted);" id="loader-subtitle">Le studio traite votre fichier...</p>
+    </div>
+  </div>
+
+</div>
 
   <script>
     const AI_BACKEND_URL = "https://byaoia-backend.byaombemwamedi.workers.dev";
@@ -1224,22 +1226,28 @@
 
     let ffmpegInstance = null;
 
-    async function getFFmpeg() {
-      if (ffmpegInstance) return ffmpegInstance;
-      
-      const { FFmpeg } = FFmpegWASM;
-      const ffmpeg = new FFmpeg();
-      const { fetchFile } = FFmpegUtil;
-      
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
-      await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-      });
-      
-      ffmpegInstance = { ffmpeg, fetchFile };
-      return ffmpegInstance;
-    }
+async function getFFmpeg() {
+  if (ffmpegInstance) return ffmpegInstance;
+  
+  try {
+    const { FFmpeg } = FFmpegWASM;
+    const { fetchFile, toBlobURL } = FFmpegUtil;
+    
+    const ffmpeg = new FFmpeg();
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
+    
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+    
+    ffmpegInstance = { ffmpeg, fetchFile };
+    return ffmpegInstance;
+  } catch (e) {
+    console.error("FFmpeg load error:", e);
+    throw new Error("Imeshindikana kupakia injini ya video.");
+  }
+}
 
     async function processVideoTool() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
