@@ -1453,7 +1453,7 @@
     }
 
     // --- GENERATE IMAGE: HUGGING FACE API KWANZA, IKISHINDWA / API KEY HAIKO TAYARI -> OFFLINE/POLLINATIONS INAINGILIA KATI ---
-    async function generateImage() {
+        async function generateImage() {
       const promptInput = document.getElementById('prompt-input').value;
       if (!promptInput.trim()) {
         showToast("Tafadhali andika maelezo ya picha!");
@@ -1462,79 +1462,50 @@
 
       showLoadingModal("Inazalisha picha...");
 
-      // Weka Hugging Face API Key yako hapa
-      const HF_API_KEY = "HUGGING_FACE_API_KEY"; 
-      const modelURL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0";
-
-      let imageUrl = "";
-
       try {
-        // Jaribio la 1: Hugging Face API Key
-        const response = await fetch(modelURL, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${HF_API_KEY}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ inputs: promptInput })
+        // Tunatengeneza kiungo cha moja kwa moja cha picha bila kupitisha fetch() inayoweza kuzuiwa na CORS
+        const encodedPrompt = encodeURIComponent(promptInput + " " + selectedStyle);
+        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+
+        // Tunahakikisha picha imetiki na kupakia vizuri kwenye kivinjari
+        await new Promise((resolve, reject) => {
+          const testImg = new Image();
+          testImg.onload = resolve;
+          testImg.onerror = reject;
+          testImg.src = imageUrl;
         });
 
-        if (!response.ok) {
-          throw new Error("Hugging Face API imeteta au haipatikani kwa sasa.");
+        currentGeneratedImageUrl = imageUrl;
+        hideLoadingModal();
+
+        const resultBox = document.getElementById('result-box');
+        const downloadBtn = document.getElementById('download-btn');
+        const placeholderText = document.getElementById('placeholder-text');
+
+        if(placeholderText) placeholderText.style.display = 'none';
+
+        resultBox.innerHTML = `
+          <img src="${imageUrl}" alt="Picha Iliyozalishwa" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+        `;
+
+        if(downloadBtn) {
+          downloadBtn.style.display = 'block';
+          downloadBtn.dataset.imgUrl = imageUrl;
         }
 
-        const blob = await response.blob();
-        imageUrl = URL.createObjectURL(blob);
-        showToast("✅ Picha imekamilika kupitia Hugging Face!");
+        showToast("✅ Picha imekamilika kikamilifu!");
 
-      } catch (hfError) {
-        console.warn("Hugging Face imeshindikana, inatumia mfumo wa nje (offline/Pollinations) kuingilia kati...", hfError);
+        // Tunatuma taarifa kwenye Google Sheet kimya kimya
+        logToGoogleSheet(promptInput, imageUrl);
         
-        try {
-          // Jaribio la 2: Offline / Pollinations API kama Fallback
-          const encodedPrompt = encodeURIComponent(promptInput + " " + selectedStyle);
-          imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true`;
-          
-          // Hakikisha picha inapatikana kabla ya kuonyesha
-          await new Promise((resolve, reject) => {
-            const testImg = new Image();
-            testImg.onload = resolve;
-            testImg.onerror = reject;
-            testImg.src = imageUrl;
-          });
-
-          showToast("✅ Picha imekamilika kupitia mfumo mbadala (offline fallback)!");
-        } catch (offlineErr) {
-          console.error("Fallbacks zote zimeshindwa:", offlineErr);
-          hideLoadingModal();
-          showToast("⚠️ Hitilafu: Imeshindikana kuzalisha picha kwa mtandao wa sasa.");
-          return;
+        if (typeof saveToGallery === 'function') {
+          saveToGallery('IA Image: ' + promptInput, imageUrl);
         }
-      }
 
-      currentGeneratedImageUrl = imageUrl;
-      hideLoadingModal();
-
-      const resultBox = document.getElementById('result-box');
-      const downloadBtn = document.getElementById('download-btn');
-      const placeholderText = document.getElementById('placeholder-text');
-
-      if(placeholderText) placeholderText.style.display = 'none';
-
-      resultBox.innerHTML = `
-        <img src="${imageUrl}" alt="Picha Iliyozalishwa" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
-      `;
-
-      if(downloadBtn) {
-        downloadBtn.style.display = 'block';
-        downloadBtn.dataset.imgUrl = imageUrl;
-      }
-
-      // Hifadhi kwenye Google Sheet kimya kimya
-      logToGoogleSheet(promptInput, imageUrl);
-      
-      if (typeof saveToGallery === 'function') {
-        saveToGallery('IA Image: ' + promptInput, imageUrl);
+      } catch (error) {
+        console.error("Hitilafu wakati wa kutengeneza picha:", error);
+        hideLoadingModal();
+        showToast("⚠️ Imeshindikana kupakia picha. Jaribu tena.");
       }
     }
 
