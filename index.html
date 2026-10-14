@@ -1091,6 +1091,73 @@
       }
     }
 
+    // --- GENERATION ENGINE (POLLINATIONS) ILIYOSANIFIWA KAMA generateImage() ---
+    async function generateImage() {
+      let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
+      const promptInput = document.getElementById('prompt-input');
+      const promptText = promptInput ? promptInput.value.trim() : "";
+
+      if (!promptText) { 
+        showToast("Veuillez décrire votre image."); 
+        return; 
+      }
+      if (credits < 1) { 
+        showToast("Crédits épuisés. Redirection..."); 
+        switchView('view-recharge'); 
+        return; 
+      }
+
+      showLoadingModal("L'IA façonne votre image...");
+
+      try {
+        const fullPrompt = `${promptText},${selectedStyle}`;
+        const encodedPrompt = encodeURIComponent(fullPrompt);
+        const seed = Math.floor(Math.random() * 10000000);
+        
+        // Pollinations.ai Image Generation URL
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&seed=${seed}&nologo=true`;
+
+        // Hakikisha picha inapakia kabla ya kuonyesha
+        const imgTest = new Image();
+        imgTest.src = imageUrl;
+        
+        imgTest.onload = () => {
+          hideLoadingModal();
+          credits -= 1;
+          localStorage.setItem('byaoia_credits', credits);
+          const creditEl = document.getElementById('user-credits');
+          if (creditEl) creditEl.innerText = credits;
+          
+          currentGeneratedImageUrl = imageUrl;
+          
+          const resultBox = document.getElementById('result-box');
+          if (resultBox) resultBox.innerHTML = `<img src="${imageUrl}" alt="Génération ByaoIA">`;
+          
+          const downloadBtn = document.getElementById('download-btn');
+          if (downloadBtn) downloadBtn.style.display = "block";
+          
+          saveToGallery(promptText, imageUrl);
+          logToGoogleSheet(promptText, imageUrl);
+          
+          showInterstitialAd(() => {
+            showToast("Image générée avec succès !");
+          });
+          
+          if (promptInput) promptInput.value = "";
+        };
+
+        imgTest.onerror = () => {
+          hideLoadingModal();
+          showToast("Erreur lors de la génération de l'image.");
+        };
+
+      } catch (err) {
+        hideLoadingModal();
+        console.error("Generation error:", err);
+        showToast("Erreur de connexion au service de génération.");
+      }
+    }
+
     // --- PHOTO STUDIO LOGIC (Na API Key check / Fallback ya offline/Canvas) ---
     async function processPhotoTool() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
@@ -1259,7 +1326,7 @@
       }
     }
 
-    // --- VIDEO STUDIO LOGIC (Na Fallback ya offline/Canvas/Basic) ---
+    // --- VIDEO STUDIO LOGIC ---
     async function processVideoTool() {
       let credits = parseInt(localStorage.getItem('byaoia_credits') || "0");
       if (credits < 1) { 
@@ -1319,7 +1386,6 @@
       } catch (error) {
         console.error("Erreur FFmpeg, inatumia mfumo wa hifadhi ya ndani (offline fallback):", error);
         
-        // Offline Fallback kama FFmpeg itashindwa kupakia au mtandao kusoma CDN
         try {
           const fallbackUrl = URL.createObjectURL(currentVideoFile);
           document.getElementById('video-preview-box').innerHTML = `<video controls src="${fallbackUrl}"></video>`;
@@ -1451,96 +1517,6 @@
         console.error("Google Sheet log error:", e);
       }
     }
-
-    // --- GENERATE IMAGE: HUGGING FACE API KWANZA, IKISHINDWA / API KEY HAIKO TAYARI -> OFFLINE/POLLINATIONS INAINGILIA KATI ---
-        async function generateImage() {
-      const promptInput = document.getElementById('prompt-input').value;
-      if (!promptInput.trim()) {
-        showToast("Tafadhali andika maelezo ya picha!");
-        return;
-      }
-
-      showLoadingModal("Inazalisha picha...");
-
-      try {
-        // Tunatengeneza kiungo cha moja kwa moja cha picha bila kupitisha fetch() inayoweza kuzuiwa na CORS
-        const encodedPrompt = encodeURIComponent(promptInput + " " + selectedStyle);
-        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
-
-        // Tunahakikisha picha imetiki na kupakia vizuri kwenye kivinjari
-        await new Promise((resolve, reject) => {
-          const testImg = new Image();
-          testImg.onload = resolve;
-          testImg.onerror = reject;
-          testImg.src = imageUrl;
-        });
-
-        currentGeneratedImageUrl = imageUrl;
-        hideLoadingModal();
-
-        const resultBox = document.getElementById('result-box');
-        const downloadBtn = document.getElementById('download-btn');
-        const placeholderText = document.getElementById('placeholder-text');
-
-        if(placeholderText) placeholderText.style.display = 'none';
-
-        resultBox.innerHTML = `
-          <img src="${imageUrl}" alt="Picha Iliyozalishwa" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
-        `;
-
-        if(downloadBtn) {
-          downloadBtn.style.display = 'block';
-          downloadBtn.dataset.imgUrl = imageUrl;
-        }
-
-        showToast("✅ Picha imekamilika kikamilifu!");
-
-        // Tunatuma taarifa kwenye Google Sheet kimya kimya
-        logToGoogleSheet(promptInput, imageUrl);
-        
-        if (typeof saveToGallery === 'function') {
-          saveToGallery('IA Image: ' + promptInput, imageUrl);
-        }
-
-      } catch (error) {
-        console.error("Hitilafu wakati wa kutengeneza picha:", error);
-        hideLoadingModal();
-        showToast("⚠️ Imeshindikana kupakia picha. Jaribu tena.");
-      }
-    }
-
-// Onyesha Loading Modal
-function showLoadingModal(text) {
-  const modal = document.getElementById('loading-modal');
-  const subtitle = document.getElementById('loader-subtitle');
-  if (subtitle && text) {
-    subtitle.textContent = text;
-  }
-  if (modal) {
-    modal.style.display = 'flex';
-  }
-}
-
-// Ficha Loading Modal
-function hideLoadingModal() {
-  const modal = document.getElementById('loading-modal');
-  if (modal) {
-    modal.style.display = 'none';
-  }
-}
-
-// Onyesha Ujumbe wa Toast
-function showToast(message) {
-  const toast = document.getElementById('toast-notification');
-  const toastText = document.getElementById('toast-text');
-  if (toast && toastText) {
-    toastText.textContent = message;
-    toast.className = "show"; // Hakikisha darasa hili lipo kwenye CSS yako ya toast
-    setTimeout(() => {
-      toast.className = toast.className.replace("show", "");
-    }, 3000);
-  }
-}
 
     function saveToGallery(prompt, url) {
       let gallery = JSON.parse(localStorage.getItem('byaoia_gallery')) || [];
